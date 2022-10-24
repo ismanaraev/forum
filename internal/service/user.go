@@ -10,13 +10,6 @@ type UserRepository interface {
 	CheckToken(Id string, Token string) error
 }
 
-type UserService interface {
-	RegisterUser(Username, Email, Password string) error
-	Authorize(Username, Password string) (string, error)
-	LogOut(Token string) error
-	CheckToken(Id string, Token string) error
-}
-
 type userService struct {
 	repo UserRepository
 }
@@ -29,8 +22,8 @@ func (u userService) RegisterUser(Username, Email, Password string) (err error) 
 	return nil
 }
 
-func (u userService) Authorize(Username, Password string) (Token string, err error) {
-	return "", nil
+func (u userService) GetUser(Username, Password string) (user models.User, err error) {
+	return models.User{}, nil
 }
 
 func (u userService) LogOut(Token string) error {

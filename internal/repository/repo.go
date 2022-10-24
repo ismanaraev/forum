@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"forum/internal/models"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -12,6 +13,12 @@ func InitDB() (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+type UserRepository interface {
+	AddUser(Username, Email, Password string) error
+	GetUserById(Id string) (models.User, error)
+	CheckToken(Id string, Token string) error
 }
 
 type Repository struct {
