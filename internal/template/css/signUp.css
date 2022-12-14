@@ -1,0 +1,51 @@
+ body{
+    background: #eee; /* цвет фона страницы */
+}
+
+.form{
+    width:300px; /* ширина блока */
+    height: 400px; /* высота блока */
+    background: rgb(165, 109, 109); /* фон блока */
+    border-radius: 10px; /* закругленные углы блока */
+    margin: 10% auto; /* отступ сверху и выравнивание по середине */
+    box-shadow: 2px 2px 4px 0px #000000; /* тень блока */
+}
+.field{
+    text-align: center;
+    padding: 35px;
+    margin-top: 50px;
+}
+
+.log{
+    width: 220px;
+    height: 35px;
+    border-radius: 10px;
+}
+
+.usn{
+    border-radius: 10px;
+    margin-top: 10px;
+    width: 220px;
+    height: 35px;
+}
+
+.email{
+    border-radius: 10px;
+    margin-top: 10px;
+    width: 220px;
+    height: 35px;
+
+}
+.pswd{
+    border-radius: 10px;
+    margin-top: 10px;
+    width: 220px;
+    height: 35px;
+}
+
+.btn{
+    margin-top: 90px;
+    width: 220px;
+    height: 35px;
+}
+
