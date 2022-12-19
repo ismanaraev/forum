@@ -12,7 +12,12 @@ func Database() (*sql.DB, error) {
 		return nil, fmt.Errorf("can't open database: %w", err)
 	}
 
-	err = repository.CreatTable(db)
+	err = repository.CreatUsersTable(db)
+	if err != nil {
+		return nil, fmt.Errorf("can't create table %v", err)
+	}
+
+	err = repository.CreatePostTable(db)
 	if err != nil {
 		return nil, fmt.Errorf("can't create table %v", err)
 	}

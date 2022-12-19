@@ -19,10 +19,11 @@ type Authorization interface {
 	CreateUser(user models.Auth) (int, error)
 	GetUserInfo(user models.Auth) (models.Auth, error)
 	GetUsersEmail(user models.Auth) (models.Auth, error)
+	GetUsersInfoByUUID(id uuid.UUID) (models.Auth, error)
 }
 
 type Post interface {
-	GetPost(post models.Post) (int, error)
+	GetAllPost() (models.Post, error)
 	CreatePost(post models.Post) (int, error)
 	UpdatePost(post models.Post) (int, error)
 	DeletePost(post models.Post) (int, error)
@@ -30,7 +31,7 @@ type Post interface {
 
 type Session interface {
 	GetSessionFromDB(token string) (uuid.UUID, error)
-	DeleteSessionFromDB(user models.Auth) (int, error)
+	DeleteSessionFromDB(uuid.UUID) error
 }
 
 func NewRepository(db *sql.DB) Repository {

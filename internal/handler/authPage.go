@@ -6,6 +6,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/gofrs/uuid"
 )
 
 // // авторизация
@@ -54,16 +56,13 @@ func (h *Handler) userSignIn(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		cookie := http.Cookie{
-			SameSite: http.SameSiteNoneMode,
-			Name:     "session_token",
-			Value:    token,
-			MaxAge:   3600 * 12,
+			Name:   "session_name",
+			Value:  token,
+			MaxAge: 300 * 50,
 		}
 		http.SetCookie(w, &cookie)
 
 		http.Redirect(w, r, "/homepage", http.StatusSeeOther)
-		// w.Write([]byte("authorization success"))
-		// w.WriteHeader(http.StatusOK)
 
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
@@ -94,7 +93,6 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 
 		username, ok := r.Form["username"]
 		if !ok {
-			fmt.Println(ok)
 			http.Error(w, "username field not found", http.StatusInternalServerError)
 			return
 		}
@@ -136,4 +134,29 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
+}
+
+func (h *Handler) logOutHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/logout" {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	uuidString := r.Context().Value("uuid")
+	value := uuidString.(string)
+
+	uuid, err := uuid.FromString(value)
+	if err != nil {
+		return
+	}
+
+	cookie := http.Cookie{
+		Name:   "session_name",
+		Value:  "",
+		MaxAge: -1,
+	}
+	http.SetCookie(w, &cookie)
+
+	h.service.DeleteSessionRQtoRepo(uuid)
+	http.Redirect(w, r, "/homepage", http.StatusSeeOther)
 }

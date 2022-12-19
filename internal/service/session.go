@@ -18,8 +18,12 @@ func NewSessionService(repo repository.Session) *SessionService {
 
 // RQ-request
 // Запрос на удаления токена и время токена
-func (s *SessionService) DeleteSessionRQtoRepo(tokenString string) {
-	// delete(s.session, tokenString)
+func (s *SessionService) DeleteSessionRQtoRepo(r uuid.UUID) error {
+	err := s.repo.DeleteSessionFromDB(r)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Получаем по токену username

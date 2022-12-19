@@ -20,12 +20,12 @@ func NewHandler(service service.Service) *Handler {
 func (h *Handler) InitRoutes() {
 	router := http.NewServeMux()
 
-	router.HandleFunc("/home", h.homepage)
+	router.HandleFunc("/homepage", h.homepage)
 	router.HandleFunc("/sign-in", h.userSignIn)
 	router.HandleFunc("/sign-up", h.userSignUp)
 	router.HandleFunc("/logout", h.IsAuthorized(h.logOutHandler))
 	router.HandleFunc("/post", h.IsAuthorized(h.postPage))
-	router.HandleFunc("/create-post", h.createPost)
+	router.HandleFunc("/create-post", h.IsAuthorized(h.createPost))
 	router.HandleFunc("/update-post", h.updatePost)
 	router.HandleFunc("/delete-post", h.deletePost)
 
@@ -34,7 +34,7 @@ func (h *Handler) InitRoutes() {
 
 	srv := new(forum3.Server)
 
-	if err := srv.Run("8086", router); err != nil {
+	if err := srv.Run("8080", router); err != nil {
 		log.Fatal("error occured while running http server: %s", err.Error())
 	}
 }

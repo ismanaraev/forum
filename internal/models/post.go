@@ -1,8 +1,6 @@
 package models
 
 import (
-	"time"
-
 	"github.com/gofrs/uuid"
 )
 
@@ -11,6 +9,6 @@ type Post struct {
 	Title      string    `json:"title"`
 	Content    string    `json:"content"`
 	Author     string    `json:"author"`
-	CreatedAt  time.Time `json:"createdat"`
+	CreatedAt  string    `json:"createdat"`
 	Categories string    `json:"categories"`
 }

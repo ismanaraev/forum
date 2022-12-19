@@ -80,6 +80,26 @@ func (a *AuthService) AuthorizationUserService(user models.Auth) (string, error)
 	return value, err
 }
 
+// Получения данных юзера из БД
+func (a *AuthService) GetUserInfoService(user models.Auth) (models.Auth, error) {
+	userInfo, err := a.repo.GetUserInfo(user) // Получает информацию с помощью почты
+	if err != nil {
+		return models.Auth{}, err
+	}
+
+	return userInfo, nil
+}
+
+// Получения данных юзера из БД c помощью токена
+func (a *AuthService) GetUsersInfoByUUIDtoRepo(id uuid.UUID) (models.Auth, error) {
+	userInfo, err := a.repo.GetUsersInfoByUUID(id)
+	if err != nil {
+		return models.Auth{}, err
+	}
+
+	return userInfo, nil
+}
+
 // Cоздает токен и время токена и отправляет в БД
 func (a *AuthService) CreateSession(user models.Auth) (string, error) {
 	token := CreateToken()

@@ -1,0 +1,37 @@
+body{
+    width:900px; /* ширина блока */
+    height: 650px; /* высота блока */
+    background:bisque;
+    border-radius: 10px; /* закругленные углы блока */
+    margin: 6% auto; /* отступ сверху и выравнивание по середине */
+    box-shadow: 2px 2px 4px 0px #000000; /* тень блока */
+    
+}
+
+
+
+.title{
+    margin-left: 20px;
+    width: 350px;
+    height: 25px;
+    border-radius: 10px;
+    resize: none;
+}
+
+.content{
+    margin-top: 10px;
+    margin-left: 20px;
+    width: 850px;
+    height: 350px;
+    border-radius: 10px;
+    resize: none;
+} 
+
+.choose{
+    margin-top: 10px;
+}
+
+.btn{
+     margin-top: 10px;
+    margin-left: 50%;
+}

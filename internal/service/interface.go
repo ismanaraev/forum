@@ -17,17 +17,19 @@ type Authorization interface {
 	CreateSession(user models.Auth) (string, error)
 	CreateUserService(user models.Auth) (int, error)
 	AuthorizationUserService(models.Auth) (string, error)
+	GetUserInfoService(user models.Auth) (models.Auth, error)
+	GetUsersInfoByUUIDtoRepo(id uuid.UUID) (models.Auth, error)
 }
 
 type Post interface {
-	GetPostService(post models.Post) (int, error)
+	GetAllPostService() (models.Post, error)
 	CreatePostService(post models.Post) (int, error)
 	UpdatePostService(post models.Post) (int, error)
 	DeletePostService(post models.Post) (int, error)
 }
 
 type Session interface {
-	DeleteSessionRQtoRepo(tokenString string)
+	DeleteSessionRQtoRepo(uuid.UUID) error
 	GetSessionRQtoRepo(token string) (uuid.UUID, error)
 }
 

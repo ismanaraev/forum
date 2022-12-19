@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/template/css/createPost.css">
+    <title>CreatePost</title>
+</head>
+<body>
+    <h1 style="text-align:center;">Create Post</h1>
+
+    <form class="form" method="POST">
+        <div class="field">
+            <textarea class="title" required type="text" placeholder="Title" name="title"></textarea>
+            <textarea class="content" required type="text" placeholder="Content" name="content"></textarea>
+        </div>
+        <div class="choose">
+        <fieldset>
+            <legend>Choose category</legend>
+            <div>
+              <input type="checkbox" name="chooseCategory" value="coding" />
+              <label for="coding">Coding</label>
+            </div>
+            <div>
+              <input type="checkbox" name="chooseCategory" value="music" />
+              <label for="music">Music</label>
+            </div>
+            <div>
+              <input type="checkbox" name="chooseCategory" value="art" />
+              <label for="art">Art</label>
+            </div>
+            <div>
+              <input type="checkbox"  name="chooseCategory" value="sports" />
+              <label for="sports">Sports</label>
+            </div>
+            <div>
+              <input type="checkbox" name="chooseCategory" value="cooking" />
+              <label for="cooking">Cooking</label>
+            </div>
+          </fieldset>
+        </div>
+        <button class="btn" type="submit">Создать пост</button>
+    </form>
+
+</body>
+</html>

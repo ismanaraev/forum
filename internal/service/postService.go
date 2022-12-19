@@ -16,12 +16,12 @@ func NewPostService(repo repository.Post) *PostService {
 	}
 }
 
-func (p *PostService) GetPostService(post models.Post) (int, error) {
-	return http.StatusOK, nil
+func (p *PostService) GetAllPostService() (models.Post, error) {
+	return p.repo.GetAllPost()
 }
 
 func (p *PostService) CreatePostService(post models.Post) (int, error) {
-	return http.StatusOK, nil
+	return p.repo.CreatePost(post)
 }
 
 func (p *PostService) UpdatePostService(post models.Post) (int, error) {

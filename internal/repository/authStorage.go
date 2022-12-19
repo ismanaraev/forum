@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/gofrs/uuid"
 )
 
 type AuthStorage struct {
@@ -56,11 +58,12 @@ func (a *AuthStorage) SetSession(user models.Auth, token string, time time.Time)
 	if err != nil {
 		return fmt.Errorf("Set session in repository: %w", UniqueConstraintFailed)
 	}
+
 	fmt.Println("Session created successfully!")
 	return nil
 }
 
-// Получить полную информация о юзере
+// Получить полную информация о юзере с помощью почты
 func (a *AuthStorage) GetUserInfo(user models.Auth) (models.Auth, error) {
 	row := a.db.QueryRow("SELECT uuid,name,username,email,password FROM users WHERE email=$1", user.Email)
 
@@ -75,7 +78,7 @@ func (a *AuthStorage) GetUserInfo(user models.Auth) (models.Auth, error) {
 
 // Получить почту юзера по username
 func (a *AuthStorage) GetUsersEmail(user models.Auth) (models.Auth, error) {
-	row := a.db.QueryRow("SELECT email FROM users WHERE email=$1", user.Username)
+	row := a.db.QueryRow("SELECT email FROM users WHERE username=$1", user.Username)
 
 	temp := models.Auth{}
 	err := row.Scan(&temp.Email)
@@ -86,8 +89,20 @@ func (a *AuthStorage) GetUsersEmail(user models.Auth) (models.Auth, error) {
 	return temp, nil
 }
 
+func (a *AuthStorage) GetUsersInfoByUUID(id uuid.UUID) (models.Auth, error) {
+	row := a.db.QueryRow("SELECT name,username,email,password FROM users WHERE uuid=$1", id)
+
+	temp := models.Auth{}
+	err := row.Scan(&temp.Name, &temp.Username, &temp.Email, &temp.Password)
+	if err != nil {
+		log.Printf("GetUsersInfoByUUID error: %v\n", err)
+		return models.Auth{}, err
+	}
+	return temp, nil
+}
+
 // Создание таблицы пользователя
-func CreatTable(db *sql.DB) error {
+func CreatUsersTable(db *sql.DB) error {
 	users_table := `CREATE TABLE IF NOT EXISTS users (
 		uuid TEXT PRIMARY KEY NOT NULL,
 		name CHAR(50) NOT NULL,
@@ -109,6 +124,32 @@ func CreatTable(db *sql.DB) error {
 		return fmt.Errorf("Create table in repository: %w", QueryExecFailed)
 	}
 
-	fmt.Println("Table created successfully!")
+	fmt.Println("Users table created successfully!")
+	return nil
+}
+
+// Создание таблицы для поста
+func CreatePostTable(db *sql.DB) error {
+	post_table := `CREATE TABLE IF NOT EXISTS post (
+		uuid TEXT NOT NULL,
+		title TEXT NOT NULL,
+		content TEXT NOT NULL,
+		author CHAR(50) NOT NULL, 
+		createdat CHAR(50) NOT NULL,
+		categories
+	);`
+
+	query, err := db.Prepare(post_table)
+	if err != nil {
+		fmt.Println(err)
+		return fmt.Errorf("Create post in repository: %w", PrepareNotCorrect)
+	}
+
+	_, err = query.Exec()
+	if err != nil {
+		return fmt.Errorf("Create post in repository: %w", QueryExecFailed)
+	}
+
+	fmt.Println("Post table created successfully!")
 	return nil
 }
