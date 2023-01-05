@@ -131,6 +131,7 @@ func CreatUsersTable(db *sql.DB) error {
 // Создание таблицы для поста
 func CreatePostTable(db *sql.DB) error {
 	post_table := `CREATE TABLE IF NOT EXISTS post (
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		uuid TEXT NOT NULL,
 		title TEXT NOT NULL,
 		content TEXT NOT NULL,

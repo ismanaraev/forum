@@ -10,12 +10,18 @@ body{
     margin: 10% auto; /* отступ сверху и выравнивание по середине */
     box-shadow: 2px 2px 4px 0px #000000; /* тень блока */
 }
+
+.btn-s{
+    margin-top: 90px;
+    width: 400px;
+    height: 35px;
+}
+
 .field{
     text-align: center;
     padding: 35px;
     margin-top: 50px;
 }
-
 
 
 .email{

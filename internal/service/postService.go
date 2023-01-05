@@ -3,7 +3,6 @@ package service
 import (
 	"forum3/internal/models"
 	"forum3/internal/repository"
-	"net/http"
 )
 
 type PostService struct {
@@ -16,7 +15,7 @@ func NewPostService(repo repository.Post) *PostService {
 	}
 }
 
-func (p *PostService) GetAllPostService() (models.Post, error) {
+func (p *PostService) GetAllPostService() ([]models.Post, error) {
 	return p.repo.GetAllPost()
 }
 
@@ -25,9 +24,9 @@ func (p *PostService) CreatePostService(post models.Post) (int, error) {
 }
 
 func (p *PostService) UpdatePostService(post models.Post) (int, error) {
-	return http.StatusOK, nil
+	return p.repo.UpdatePost(post)
 }
 
 func (p *PostService) DeletePostService(post models.Post) (int, error) {
-	return http.StatusOK, nil
+	return p.repo.DeletePost(post)
 }

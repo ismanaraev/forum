@@ -22,7 +22,7 @@ type Authorization interface {
 }
 
 type Post interface {
-	GetAllPostService() (models.Post, error)
+	GetAllPostService() ([]models.Post, error)
 	CreatePostService(post models.Post) (int, error)
 	UpdatePostService(post models.Post) (int, error)
 	DeletePostService(post models.Post) (int, error)

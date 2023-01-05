@@ -78,7 +78,7 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 			Title:      title[0],
 			Content:    content,
 			Author:     userInfo.Username,
-			CreatedAt:  time.Now().Format("yyyy-mm-dd HH:mm:ss"),
+			CreatedAt:  time.Now().Format(time.RFC1123),
 			Categories: categoryStr,
 		}
 

@@ -34,7 +34,7 @@ func (h *Handler) InitRoutes() {
 
 	srv := new(forum3.Server)
 
-	if err := srv.Run("8080", router); err != nil {
+	if err := srv.Run("8081", router); err != nil {
 		log.Fatal("error occured while running http server: %s", err.Error())
 	}
 }
