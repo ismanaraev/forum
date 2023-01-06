@@ -27,6 +27,16 @@ func Database() (*sql.DB, error) {
 		return nil, fmt.Errorf("can't create comments table %v", err)
 	}
 
+	err = repository.CreateTableForLikePost(db)
+	if err != nil {
+		return nil, fmt.Errorf("can't create like table %v", err)
+	}
+
+	err = repository.CreateTableForLikeComments(db)
+	if err != nil {
+		return nil, fmt.Errorf("can't create dislike table %v", err)
+	}
+
 	if err := db.Ping(); err != nil {
 		return nil, fmt.Errorf("can't open database: %w", err)
 	}

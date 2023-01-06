@@ -30,6 +30,9 @@ type Post interface {
 	CreatePostService(post models.Post) (int, error)
 	UpdatePostService(post models.Post) (int, error)
 	DeletePostService(post models.Post) (int, error)
+	// CreateLikeTable(like models.LikePost) (models.LikePost, error)
+	LikeInService(like models.LikePost) (models.LikePost, error)
+	// CounterLikeInService() int
 }
 
 type Session interface {

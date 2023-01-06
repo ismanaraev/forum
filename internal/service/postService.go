@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"forum3/internal/models"
 	"forum3/internal/repository"
 )
@@ -46,3 +47,23 @@ func (p *PostService) UpdatePostService(post models.Post) (int, error) {
 func (p *PostService) DeletePostService(post models.Post) (int, error) {
 	return p.repo.DeletePost(post)
 }
+
+func (p *PostService) LikeInService(like models.LikePost) (models.LikePost, error) {
+	t := p.repo.GetUUIDbyUser(like)
+	fmt.Println(t)
+	if t == 0 {
+		return p.repo.CreateLikeForPost(like)
+	} else if like.Status == 1 {
+		return p.repo.AddLikeForPost(like)
+	} else {
+		return p.repo.AddDislikeForPost(like)
+	}
+}
+
+// func (p *PostService) CreateLikeTable(like models.LikePost) (models.LikePost, error) {
+// 	return p.repo.CreateLikeForPost(like)
+// }
+
+// func (p *PostService) CounterLikeInService() int {
+// 	return p.repo.CounterLike()
+// }

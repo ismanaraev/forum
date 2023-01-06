@@ -8,7 +8,7 @@
     <title>Comments</title>
 </head>
 <body>
-         <fieldset>
+        <fieldset>
             <legend>{{ .Post.Author }}</legend>
              <h3>{{ .Post.Title }}</h3>
                 <br>
@@ -16,16 +16,21 @@
                 <br>
                 <p>Category:{{ .Post.Categories }}</p> 
 
+                <form method="POST">
+                    <button class="btn-like" name="like" type="submit" value="1">Like</button>
+                    <button class="btn-dislike" name="dislike" type="submit" value="-1">Dislike</button>
+                </form>
+
                 
                 <p>Comments:</p>
 
                  {{ range .Comment }}
-                 <fieldset>       
+                    <fieldset>       
                         <legend>{{ .Author }}</legend> 
                                  {{ .Content }}
                     </fieldset>
                 {{ end }}
-             </fieldset>
+        </fieldset>
              <br>
 
              <form method="POST">

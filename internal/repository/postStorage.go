@@ -18,22 +18,22 @@ func NewPostSQLite(db *sql.DB) *PostStorage {
 }
 
 func (p *PostStorage) GetAllPost() ([]models.Post, error) {
-	temp := models.Post{}
-	allPost := []models.Post{}
-	n := 1
-
-	for i := 1; i <= n; i++ {
-		row := p.db.QueryRow("SELECT id,uuid,title,content,author,createdAt,categories FROM post WHERE id=$1", n)
-		err := row.Scan(&temp.ID, &temp.Uuid, &temp.Title, &temp.Content, &temp.Author, &temp.CreatedAt, &temp.Categories)
-		if err != nil {
-			//	fmt.Println(err)
-			return allPost, nil
-		}
-		allPost = append(allPost, temp)
-		n++
+	row, err := p.db.Query("SELECT id,uuid,title,content,author,createdAt,categories FROM post")
+	if err != nil {
+		return nil, fmt.Errorf("SELECT allpost in repository: %w", err)
 	}
 
-	// uuid,title,content,author,createdat,categories
+	temp := models.Post{}
+	allPost := []models.Post{}
+
+	for row.Next() {
+		err := row.Scan(&temp.ID, &temp.Uuid, &temp.Title, &temp.Content, &temp.Author, &temp.CreatedAt, &temp.Categories)
+		if err != nil {
+			return nil, err
+		}
+		allPost = append(allPost, temp)
+	}
+
 	return allPost, nil
 }
 
@@ -66,6 +66,7 @@ func (p *PostStorage) CreatePost(post models.Post) (int, error) {
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("Create post in repository: %w", err)
 	}
+
 	fmt.Println("Post created successfully!")
 
 	return http.StatusOK, nil
@@ -116,6 +117,78 @@ func (p *PostStorage) CreateComments(com models.Comments) (int, error) {
 	return http.StatusOK, nil
 }
 
+func (p *PostStorage) CreateLikeForPost(like models.LikePost) (models.LikePost, error) {
+	queryForLike, err := p.db.Prepare(`INSERT INTO likePost(userID,postID) VALUES ($1,$2)`)
+	if err != nil {
+		fmt.Println(err)
+		return like, fmt.Errorf("Create like in repository: %w", PrepareNotCorrect)
+	}
+
+	_, err = queryForLike.Exec(like.UserID, like.PostID)
+	if err != nil {
+		return like, fmt.Errorf("Create like in repository: %w", err)
+	}
+	fmt.Println("Like created successfully!")
+
+	return like, nil
+}
+
+func (p *PostStorage) AddLikeForPost(like models.LikePost) (models.LikePost, error) {
+	records := ("UPDATE likePost SET status = 1 WHERE postID = $1")
+
+	query, err := p.db.Prepare(records)
+	if err != nil {
+		return like, fmt.Errorf("Add like in repository: %w", PrepareNotCorrect)
+	}
+
+	_, err = query.Exec(like.PostID)
+	if err != nil {
+		return like, fmt.Errorf("Add like in repository: %w", UniqueConstraintFailed)
+	}
+
+	fmt.Println("Add like is successfully!")
+	return like, nil
+}
+
+func (p *PostStorage) AddDislikeForPost(like models.LikePost) (models.LikePost, error) {
+	records := ("UPDATE likePost SET status = -1  WHERE postID = $1")
+
+	query, err := p.db.Prepare(records)
+	if err != nil {
+		return like, fmt.Errorf("Add like in repository: %w", PrepareNotCorrect)
+	}
+
+	_, err = query.Exec(like.PostID)
+	if err != nil {
+		return like, fmt.Errorf("Add like in repository: %w", UniqueConstraintFailed)
+	}
+
+	fmt.Println("Add dislike is successfully!")
+	return like, nil
+}
+
+func (p *PostStorage) GetUUIDbyUser(like models.LikePost) int {
+	row := p.db.QueryRow("SELECT postID FROM likePost WHERE userID=$1", like.UserID)
+	temp := models.LikePost{}
+	err := row.Scan(&temp.PostID)
+	if err != nil {
+		return temp.PostID
+	}
+	return temp.PostID
+}
+
+// func (p *PostStorage) CounterLike() int {
+// 	row := p.db.QueryRow("SELECT COUNT(*) FROM likePost WHERE status=1")
+
+// 	count := 0
+// 	err := row.Scan(count)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return http.StatusInternalServerError
+// 	}
+// 	return count
+// }
+
 func (p *PostStorage) UpdatePost(post models.Post) (int, error) {
 	return http.StatusOK, nil
 }
@@ -123,3 +196,14 @@ func (p *PostStorage) UpdatePost(post models.Post) (int, error) {
 func (p *PostStorage) DeletePost(post models.Post) (int, error) {
 	return http.StatusOK, nil
 }
+
+// queryForLike, err := p.db.Prepare(`INSERT INTO like(userID) VALUES ($1)`)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return http.StatusInternalServerError, fmt.Errorf("Create like in repository: %w", PrepareNotCorrect)
+// 	}
+
+// 	_, err = queryForLike.Exec(post.Uuid)
+// 	if err != nil {
+// 		return http.StatusBadRequest, fmt.Errorf("Create like in repository: %w", err)
+// 	}

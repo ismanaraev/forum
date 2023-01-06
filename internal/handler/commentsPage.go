@@ -13,8 +13,10 @@ import (
 )
 
 type AllDataComments struct {
-	Post    models.Post
-	Comment []models.Comments
+	Post         models.Post
+	Comment      []models.Comments
+	LikePost     models.LikePost
+	LikeComments models.LikeComments
 }
 
 func (h *Handler) comment(w http.ResponseWriter, r *http.Request) {
@@ -52,23 +54,23 @@ func (h *Handler) comment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		data := &AllDataComments{
+		result := &AllDataComments{
 			Post:    content,
 			Comment: allComments,
 		}
 
-		html.Execute(w, data)
+		html.Execute(w, result)
 	case http.MethodPost:
 		token, err := r.Cookie("session_name")
 		if err != nil {
-			http.Redirect(w, r, "/sign-up", http.StatusSeeOther)
+			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
 		data := &models.Auth{}
 
 		data.Uuid, err = h.service.GetSessionRQtoRepo(token.Value)
 		if err != nil {
-			http.Redirect(w, r, "/sign-up", http.StatusSeeOther)
+			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
 
@@ -77,46 +79,72 @@ func (h *Handler) comment(w http.ResponseWriter, r *http.Request) {
 			log.Fatalf("Get user info from handler don`t work %e", err)
 		}
 
-		r.ParseForm()
+		// r.ParseForm()
 
-		commentsR, ok := r.Form["commentsS"]
-		if !ok {
-			http.Error(w, "commentary field not found", http.StatusInternalServerError)
-			return
-		}
-		comments := strings.Join(commentsR, " ")
+		// commentsR, ok := r.Form["commentsS"]
+		// if !ok {
+		// 	http.Error(w, "commentary field not found", http.StatusInternalServerError)
+		// 	return
+		// }
+		// comments := strings.Join(commentsR, " ")
 
-		com := models.Comments{
-			Author:    userInfo.Username,
-			Content:   comments,
-			CreatedAt: time.Now().Format(time.RFC1123),
-			PostID:    postID,
-		}
+		comments := r.FormValue("commentsS")
+		if comments != "" {
+			com := models.Comments{
+				Author:    userInfo.Username,
+				Content:   comments,
+				CreatedAt: time.Now().Format(time.RFC1123),
+				PostID:    postID,
+			}
 
-		status, err := h.service.CreateCommentsInService(com)
-		if err != nil {
-			fmt.Println(err)
-			http.Error(w, http.StatusText(status), status)
-			log.Printf("Comment not created")
+			status, err := h.service.CreateCommentsInService(com)
+			if err != nil {
+				http.Error(w, http.StatusText(status), status)
+				log.Printf("Comment not created")
+			}
 		}
 
 		content, err := h.service.GetPostByIDinService(postID)
 		if err != nil {
-
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
 
 		allComments, err := h.service.GetCommentsByIDinService(postID)
 		if err != nil {
-			fmt.Println(err)
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
 
+		vote := 0
+		like := r.FormValue("like")
+		dislike := r.FormValue("dislike")
+		fmt.Println(like)
+		fmt.Println(dislike)
+
+		if like == "" {
+			vote, _ = strconv.Atoi(dislike)
+			dislike = ""
+		} else {
+			vote, _ = strconv.Atoi(like)
+			like = ""
+		}
+
+		fmt.Println(vote)
+		allReaction := models.LikePost{
+			UserID: data.Uuid,
+			PostID: postID,
+			Status: vote,
+		}
+
+		likeReaction, _ := h.service.LikeInService(allReaction)
+
+		// likeCounter := h.service.CounterLikeInService()
+
 		result := &AllDataComments{
-			Post:    content,
-			Comment: allComments,
+			Post:     content,
+			Comment:  allComments,
+			LikePost: likeReaction,
 		}
 
 		html.Execute(w, result)

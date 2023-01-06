@@ -31,6 +31,11 @@ type Post interface {
 	CreatePost(post models.Post) (int, error)
 	UpdatePost(post models.Post) (int, error)
 	DeletePost(post models.Post) (int, error)
+	CreateLikeForPost(like models.LikePost) (models.LikePost, error)
+	AddLikeForPost(like models.LikePost) (models.LikePost, error)
+	AddDislikeForPost(like models.LikePost) (models.LikePost, error)
+	GetUUIDbyUser(like models.LikePost) int
+	// CounterLike() int
 }
 
 type Session interface {

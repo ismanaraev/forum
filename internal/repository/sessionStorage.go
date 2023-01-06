@@ -24,7 +24,6 @@ func (s *SessionStorage) GetSessionFromDB(token string) (uuid.UUID, error) {
 	temp := models.Auth{}
 	err := row.Scan(&temp.Uuid)
 	if err != nil {
-		fmt.Print("!")
 		return temp.Uuid, err
 	}
 	return temp.Uuid, nil
