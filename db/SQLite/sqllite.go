@@ -14,12 +14,17 @@ func Database() (*sql.DB, error) {
 
 	err = repository.CreatUsersTable(db)
 	if err != nil {
-		return nil, fmt.Errorf("can't create table %v", err)
+		return nil, fmt.Errorf("can't create user table %v", err)
 	}
 
 	err = repository.CreatePostTable(db)
 	if err != nil {
-		return nil, fmt.Errorf("can't create table %v", err)
+		return nil, fmt.Errorf("can't create post table %v", err)
+	}
+
+	err = repository.CreateCommentsTable(db)
+	if err != nil {
+		return nil, fmt.Errorf("can't create comments table %v", err)
 	}
 
 	if err := db.Ping(); err != nil {

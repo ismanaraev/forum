@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/template/css/commentsPage.css">
+    <title>Comments</title>
+</head>
+<body>
+         <fieldset>
+            <legend>{{ .Post.Author }}</legend>
+             <h3>{{ .Post.Title }}</h3>
+                <br>
+                    {{  .Post.Content }}
+                <br>
+                <p>Category:{{ .Post.Categories }}</p> 
+
+                
+                <p>Comments:</p>
+
+                 {{ range .Comment }}
+                 <fieldset>       
+                        <legend>{{ .Author }}</legend> 
+                                 {{ .Content }}
+                    </fieldset>
+                {{ end }}
+             </fieldset>
+             <br>
+
+             <form method="POST">
+             <textarea class="comments-class" type="txt" name="commentsS"></textarea>
+             <br>
+             <button class="btn-comments" type="submit">Отправить</button>
+             <br>
+            </form>
+             <p>Author</p>
+
+</body>
+</html>

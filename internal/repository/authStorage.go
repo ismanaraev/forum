@@ -137,20 +137,47 @@ func CreatePostTable(db *sql.DB) error {
 		content TEXT NOT NULL,
 		author CHAR(50) NOT NULL, 
 		createdat CHAR(50) NOT NULL,
-		categories
+		categories,
+		like INTEGER,
+		dislike INTEGER
 	);`
 
 	query, err := db.Prepare(post_table)
 	if err != nil {
-		fmt.Println(err)
-		return fmt.Errorf("Create post in repository: %w", PrepareNotCorrect)
+		return fmt.Errorf("Create post table in repository: %w", PrepareNotCorrect)
 	}
 
 	_, err = query.Exec()
 	if err != nil {
-		return fmt.Errorf("Create post in repository: %w", QueryExecFailed)
+		return fmt.Errorf("Create post table in repository: %w", QueryExecFailed)
 	}
 
 	fmt.Println("Post table created successfully!")
+	return nil
+}
+
+func CreateCommentsTable(db *sql.DB) error {
+	comments_table := `CREATE TABLE IF NOT EXISTS comments (
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		postID INTEGER,
+		content TEXT NOT NULL,
+		author CHAR(50) NOT NULL, 
+		like INTEGER,
+		dislike INTEGER,
+		createdat CHAR(50) NOT NULL
+	);`
+
+	query, err := db.Prepare(comments_table)
+	if err != nil {
+		fmt.Println(err)
+		return fmt.Errorf("Create comments table in repository: %w", PrepareNotCorrect)
+	}
+
+	_, err = query.Exec()
+	if err != nil {
+		return fmt.Errorf("Create comments table in repository: %w", QueryExecFailed)
+	}
+
+	fmt.Println("Comments table created successfully!")
 	return nil
 }

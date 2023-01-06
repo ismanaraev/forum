@@ -26,6 +26,7 @@ func (h *Handler) InitRoutes() {
 	router.HandleFunc("/logout", h.IsAuthorized(h.logOutHandler))
 	router.HandleFunc("/post", h.IsAuthorized(h.postPage))
 	router.HandleFunc("/create-post", h.IsAuthorized(h.createPost))
+	router.HandleFunc("/comments/", h.comment)
 	router.HandleFunc("/update-post", h.updatePost)
 	router.HandleFunc("/delete-post", h.deletePost)
 

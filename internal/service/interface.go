@@ -23,6 +23,10 @@ type Authorization interface {
 
 type Post interface {
 	GetAllPostService() ([]models.Post, error)
+	GetAllCommentsInService() ([]models.Comments, error)
+	CreateCommentsInService(com models.Comments) (int, error)
+	GetPostByIDinService(id int) (models.Post, error)
+	GetCommentsByIDinService(postID int) ([]models.Comments, error)
 	CreatePostService(post models.Post) (int, error)
 	UpdatePostService(post models.Post) (int, error)
 	DeletePostService(post models.Post) (int, error)

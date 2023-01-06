@@ -12,4 +12,6 @@ type Post struct {
 	Author     string    `json:"author"`
 	CreatedAt  string    `json:"createdat"`
 	Categories string    `json:"categories"`
+	Like       int       `json:"like"`
+	Dislike    int       `json:"dislike"`
 }

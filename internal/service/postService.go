@@ -19,6 +19,22 @@ func (p *PostService) GetAllPostService() ([]models.Post, error) {
 	return p.repo.GetAllPost()
 }
 
+func (p *PostService) GetPostByIDinService(id int) (models.Post, error) {
+	return p.repo.GetPostByID(id)
+}
+
+func (p *PostService) GetAllCommentsInService() ([]models.Comments, error) {
+	return p.repo.GetAllComments()
+}
+
+func (p *PostService) GetCommentsByIDinService(postID int) ([]models.Comments, error) {
+	return p.repo.GetCommentsByID(postID)
+}
+
+func (p *PostService) CreateCommentsInService(com models.Comments) (int, error) {
+	return p.repo.CreateComments(com)
+}
+
 func (p *PostService) CreatePostService(post models.Post) (int, error) {
 	return p.repo.CreatePost(post)
 }

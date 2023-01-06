@@ -14,48 +14,58 @@
 
         {{ .Data.Username }}
         
-    <form class="form" action="/create-post" method="GET">
+       
+
+    <form class="formCreatePost" action="/create-post" method="GET">
         <div>
-            <button class="btn" type="submit">Создать пост</button>
+            <button class="btnCP" type="submit">Создать пост</button>
         </div>
     </form>
     
+    <br>
 
-    <form class="form" action="/logout" method="GET">
+    <form class="formLogout" action="/logout" method="GET">
         <div>
-            <button class="btn" type="submit">Выйти</button>
+            <button class="btnL" type="submit">Выйти</button>
         </div>
     </form> 
    
              {{ else }}
  
-    <form class="form" action="/sign-up" method="GET">
+    <form class="formSign-up" action="/sign-up" method="GET">
         <div>
-            <button class="btn" type="submit">Регистрация</button>
+            <button class="btnSup" type="submit">Регистрация</button>
         </div>
     </form>
     
-    <form class="form" action="/sign-in" method="GET">
+    <form class="formSing-in" action="/sign-in" method="GET">
         <div>
-            <button class="btn" type="submit">Авторизация</button>
+            <button class="btnSin" type="submit">Авторизация</button>
         </div>
     </form>
     
 
     {{ end }}
     
+    <div class="post">
         {{ range .Post }}
-        <fieldset>
+          <fieldset>
             <legend>{{ .Author }}</legend>
-               <h3>{{ .Title }}</h3> 
+              <a href="/comments/{{ .ID }}">{{ .Title }}</a>
                 <br>
-                      {{  .Content }}
-                 <br>
-                 <p>Category:</p> {{ .Categories }}
-        </fieldset>
-            <br>
-            <br>
+                    {{  .Content }}
+                <br>
+                <p>Category:{{ .Categories }}</p> 
+   
+             </fieldset>
         {{ end }}
+              
+            <br>
+    </div>
+
+
+
+
 
     </body>
 </html>
