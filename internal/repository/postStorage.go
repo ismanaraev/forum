@@ -133,15 +133,15 @@ func (p *PostStorage) CreateLikeForPost(like models.LikePost) (models.LikePost, 
 	return like, nil
 }
 
-func (p *PostStorage) AddLikeForPost(like models.LikePost) (models.LikePost, error) {
-	records := ("UPDATE likePost SET status = 1 WHERE postID = $1")
+func (p *PostStorage) UpdateLikeStatus(like models.LikePost) (models.LikePost, error) {
+	records := ("UPDATE likePost SET status = $1 WHERE postID = $2")
 
 	query, err := p.db.Prepare(records)
 	if err != nil {
 		return like, fmt.Errorf("Add like in repository: %w", PrepareNotCorrect)
 	}
 
-	_, err = query.Exec(like.PostID)
+	_, err = query.Exec(like.Status, like.PostID)
 	if err != nil {
 		return like, fmt.Errorf("Add like in repository: %w", UniqueConstraintFailed)
 	}
@@ -150,21 +150,22 @@ func (p *PostStorage) AddLikeForPost(like models.LikePost) (models.LikePost, err
 	return like, nil
 }
 
-func (p *PostStorage) AddDislikeForPost(like models.LikePost) (models.LikePost, error) {
-	records := ("UPDATE likePost SET status = -1  WHERE postID = $1")
+func (p *PostStorage) CheckLikeByPostAndUserID(like models.LikePost) (bool, error) {
+	stmt := `SELECT status FROM likePost WHERE userID == $1 AND postID == $2`
 
-	query, err := p.db.Prepare(records)
+	query, err := p.db.Prepare(stmt)
 	if err != nil {
-		return like, fmt.Errorf("Add like in repository: %w", PrepareNotCorrect)
+		return false, err
 	}
-
-	_, err = query.Exec(like.PostID)
+	res := query.QueryRow(like.UserID, like.PostID)
+	err = res.Err()
 	if err != nil {
-		return like, fmt.Errorf("Add like in repository: %w", UniqueConstraintFailed)
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, err
 	}
-
-	fmt.Println("Add dislike is successfully!")
-	return like, nil
+	return true, nil
 }
 
 func (p *PostStorage) GetUUIDbyUser(like models.LikePost) int {

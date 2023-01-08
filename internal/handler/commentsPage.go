@@ -116,17 +116,17 @@ func (h *Handler) comment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		vote := 0
+		var vote models.LikeStatus
 		like := r.FormValue("like")
 		dislike := r.FormValue("dislike")
 		fmt.Println(like)
 		fmt.Println(dislike)
 
 		if like == "" {
-			vote, _ = strconv.Atoi(dislike)
+			vote = models.DisLike
 			dislike = ""
 		} else {
-			vote, _ = strconv.Atoi(like)
+			vote = models.Like
 			like = ""
 		}
 
@@ -137,7 +137,11 @@ func (h *Handler) comment(w http.ResponseWriter, r *http.Request) {
 			Status: vote,
 		}
 
-		likeReaction, _ := h.service.LikeInService(allReaction)
+		likeReaction, err := h.service.LikeInService(allReaction)
+		if err != nil {
+			log.Printf("likeReaction error: %v", err)
+			http.Error(w, "a", http.StatusInternalServerError)
+		}
 
 		// likeCounter := h.service.CounterLikeInService()
 

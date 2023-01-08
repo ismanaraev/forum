@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"forum3/internal/repository"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func Database() (*sql.DB, error) {

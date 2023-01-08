@@ -19,7 +19,7 @@ func CreatUsersTable(db *sql.DB) error {
 
 	query, err := db.Prepare(users_table)
 	if err != nil {
-		return fmt.Errorf("Create table in repository: %w", PrepareNotCorrect)
+		return fmt.Errorf("Create table in repository: %w", err)
 	}
 
 	_, err = query.Exec()
