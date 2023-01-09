@@ -29,6 +29,11 @@
                         <legend>{{ .Author }}</legend> 
                                  {{ .Content }}
                     </fieldset>
+		    <form method="POST"> 
+			    <button class="btn-like" name="like" type="submit" value="1">Like</button>
+			    <button class="btn-dislike" name="dislike" type="submit" value="-1">Dislike</button>
+			    <input type="hidden" name="commentID" value={{.ID}}>
+		    </form>
                 {{ end }}
         </fieldset>
              <br>

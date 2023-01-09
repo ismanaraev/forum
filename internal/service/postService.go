@@ -3,7 +3,6 @@ package service
 import (
 	"forum3/internal/models"
 	"forum3/internal/repository"
-	"log"
 )
 
 type PostService struct {
@@ -48,17 +47,33 @@ func (p *PostService) DeletePostService(post models.Post) (int, error) {
 	return p.repo.DeletePost(post)
 }
 
-func (p *PostService) LikeInService(like models.LikePost) (models.LikePost, error) {
-	log.Println("ABOBA")
-	exist, err := p.repo.CheckLikeByPostAndUserID(like)
+func (p *PostService) LikePost(like models.LikePost) (models.LikePost, error) {
+	status, err := p.repo.GetLikeStatusByPostAndUserID(like)
 	if err != nil {
 		return models.LikePost{}, err
 	}
-	log.Println("ABOBUS")
-	if exist {
-		return p.repo.UpdateLikeStatus(like)
-	} else {
+	if status == models.NoLike {
 		return p.repo.CreateLikeForPost(like)
+	} else {
+		if status != like.Status {
+			return p.repo.UpdatePostLikeStatus(like)
+		}
+		return like, nil
+	}
+}
+
+func (p *PostService) LikeComment(like models.LikeComments) (models.LikeComments, error) {
+	status, err := p.repo.GetLikeStatusByCommentAndUserID(like)
+	if err != nil {
+		return models.LikeComments{}, err
+	}
+	if status == models.NoLike {
+		return p.repo.CreateLikeForComment(like)
+	} else {
+		if status != like.Status {
+			return p.repo.UpdateCommentLikeStatus(like)
+		}
+		return like, nil
 	}
 }
 

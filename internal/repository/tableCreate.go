@@ -19,12 +19,12 @@ func CreatUsersTable(db *sql.DB) error {
 
 	query, err := db.Prepare(users_table)
 	if err != nil {
-		return fmt.Errorf("Create table in repository: %w", err)
+		return fmt.Errorf("create table in repository: %v", err)
 	}
 
 	_, err = query.Exec()
 	if err != nil {
-		return fmt.Errorf("Create table in repository: %w", QueryExecFailed)
+		return fmt.Errorf("create table in repository: %v", err)
 	}
 
 	fmt.Println("Users table created successfully!")
@@ -41,18 +41,18 @@ func CreatePostTable(db *sql.DB) error {
 		author CHAR(50) NOT NULL, 
 		createdat CHAR(50) NOT NULL,
 		categories,
-		like INTEGER,
-		dislike INTEGER
+		like INTEGER DEFAULT 0, 
+		dislike INTEGER DEFAULT 0
 	);`
 
 	query, err := db.Prepare(post_table)
 	if err != nil {
-		return fmt.Errorf("Create post table in repository: %w", PrepareNotCorrect)
+		return fmt.Errorf("create post table in repository: %v", err)
 	}
 
 	_, err = query.Exec()
 	if err != nil {
-		return fmt.Errorf("Create post table in repository: %w", QueryExecFailed)
+		return fmt.Errorf("create post table in repository: %v", err)
 	}
 
 	fmt.Println("Post table created successfully!")
@@ -65,19 +65,19 @@ func CreateCommentsTable(db *sql.DB) error {
 		postID INTEGER,
 		content TEXT NOT NULL,
 		author CHAR(50) NOT NULL, 
-		like INTEGER,
-		dislike INTEGER,
+		like INTEGER DEFAULT 0,
+		dislike INTEGER DEFAULT 0,
 		createdat CHAR(50) NOT NULL
 	);`
 
 	query, err := db.Prepare(comments_table)
 	if err != nil {
-		return fmt.Errorf("Create comments table in repository: %w", PrepareNotCorrect)
+		return fmt.Errorf("create comments table in repository: %v", err)
 	}
 
 	_, err = query.Exec()
 	if err != nil {
-		return fmt.Errorf("Create comments table in repository: %w", QueryExecFailed)
+		return fmt.Errorf("create comments table in repository: %v", err)
 	}
 
 	fmt.Println("Comments table created successfully!")
@@ -87,19 +87,19 @@ func CreateCommentsTable(db *sql.DB) error {
 func CreateTableForLikePost(db *sql.DB) error {
 	like_table := `CREATE TABLE IF NOT EXISTS likePost(
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		userID TEXT,
-		postID INTEGER,
-		status INTEGER
+		userID TEXT NOT NULL,
+		postID INTEGER NOT NULL,
+		status INTEGER DEFAULT 0
 		);`
 
 	query, err := db.Prepare(like_table)
 	if err != nil {
-		return fmt.Errorf("Create like table in repository: %w", PrepareNotCorrect)
+		return fmt.Errorf("create like table in repository: %v", err)
 	}
 
 	_, err = query.Exec()
 	if err != nil {
-		return fmt.Errorf("Create likePost table in repository: %w", QueryExecFailed)
+		return fmt.Errorf("create likePost table in repository: %v", err)
 	}
 
 	fmt.Println("LikePost table created successfully!")
@@ -109,19 +109,19 @@ func CreateTableForLikePost(db *sql.DB) error {
 func CreateTableForLikeComments(db *sql.DB) error {
 	like_table := `CREATE TABLE IF NOT EXISTS likeComments(
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		userID TEXT,
-		commentsID INTEGER,
-		status INTEGER
+		userID TEXT NOT NULL,
+		commentsID INTEGER NOT NULL,
+		status INTEGER DEFAULT 0
 		);`
 
 	query, err := db.Prepare(like_table)
 	if err != nil {
-		return fmt.Errorf("Create likeComments table in repository: %w", PrepareNotCorrect)
+		return fmt.Errorf("create likeComments table in repository: %v", err)
 	}
 
 	_, err = query.Exec()
 	if err != nil {
-		return fmt.Errorf("Create like table in repository: %w", QueryExecFailed)
+		return fmt.Errorf("create like table in repository: %v", err)
 	}
 
 	fmt.Println("LikeComments table created successfully!")
@@ -138,12 +138,12 @@ func CreateTableForLikeComments(db *sql.DB) error {
 
 // 	query, err := db.Prepare(dislike_table)
 // 	if err != nil {
-// 		return fmt.Errorf("Create dislike table in repository: %w", PrepareNotCorrect)
+// 		return fmt.Errorf("create dislike table in repository: %v", err)
 // 	}
 
 // 	_, err = query.Exec()
 // 	if err != nil {
-// 		return fmt.Errorf("Create dislike table in repository: %w", QueryExecFailed)
+// 		return fmt.Errorf("create dislike table in repository: %v", err)
 // 	}
 
 // 	fmt.Println("Dislike table created successfully!")

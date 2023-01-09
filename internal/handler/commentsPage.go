@@ -130,14 +130,13 @@ func (h *Handler) comment(w http.ResponseWriter, r *http.Request) {
 			like = ""
 		}
 
-		fmt.Println(vote)
 		allReaction := models.LikePost{
 			UserID: data.Uuid,
 			PostID: postID,
 			Status: vote,
 		}
 
-		likeReaction, err := h.service.LikeInService(allReaction)
+		likeReaction, err := h.service.LikePost(allReaction)
 		if err != nil {
 			log.Printf("likeReaction error: %v", err)
 			http.Error(w, "a", http.StatusInternalServerError)

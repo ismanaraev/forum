@@ -32,9 +32,12 @@ type Post interface {
 	UpdatePost(post models.Post) (int, error)
 	DeletePost(post models.Post) (int, error)
 	CreateLikeForPost(like models.LikePost) (models.LikePost, error)
-	UpdateLikeStatus(like models.LikePost) (models.LikePost, error)
+	CreateLikeForComment(like models.LikeComments) (models.LikeComments, error)
+	UpdatePostLikeStatus(like models.LikePost) (models.LikePost, error)
+	UpdateCommentLikeStatus(like models.LikeComments) (models.LikeComments, error)
 	GetUUIDbyUser(like models.LikePost) int
-	CheckLikeByPostAndUserID(like models.LikePost) (bool, error)
+	GetLikeStatusByPostAndUserID(like models.LikePost) (models.LikeStatus, error)
+	GetLikeStatusByCommentAndUserID(like models.LikeComments) (models.LikeStatus, error)
 	// CounterLike() int
 }
 

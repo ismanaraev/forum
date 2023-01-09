@@ -117,55 +117,136 @@ func (p *PostStorage) CreateComments(com models.Comments) (int, error) {
 	return http.StatusOK, nil
 }
 
-func (p *PostStorage) CreateLikeForPost(like models.LikePost) (models.LikePost, error) {
-	queryForLike, err := p.db.Prepare(`INSERT INTO likePost(userID,postID) VALUES ($1,$2)`)
+func (p *PostStorage) CreateLikeForComment(like models.LikeComments) (models.LikeComments, error) {
+	queryForLike, err := p.db.Prepare(`INSERT INTO likeComments(userID, commentsID, status) VALUES ($1,$2,$3)`)
 	if err != nil {
-		fmt.Println(err)
-		return like, fmt.Errorf("Create like in repository: %w", PrepareNotCorrect)
+		return like, fmt.Errorf("create like in repository error: %w", err)
 	}
 
-	_, err = queryForLike.Exec(like.UserID, like.PostID)
+	_, err = queryForLike.Exec(like.UserID, like.CommentsID, like.Status)
 	if err != nil {
-		return like, fmt.Errorf("Create like in repository: %w", err)
+		return like, fmt.Errorf("create like in repository error: %v", err)
 	}
-	fmt.Println("Like created successfully!")
+	switch like.Status {
+	case models.NoLike:
+		break
+	case models.Like:
+		p.IncrementLikeForPostByCommentsID(like.CommentsID)
+	case models.DisLike:
+		p.DecrementLikeForPostByCommentsID(like.CommentsID)
+	}
 
 	return like, nil
 }
 
-func (p *PostStorage) UpdateLikeStatus(like models.LikePost) (models.LikePost, error) {
+func (p *PostStorage) CreateLikeForPost(like models.LikePost) (models.LikePost, error) {
+	queryForLike, err := p.db.Prepare(`INSERT INTO likePost(userID,postID, status) VALUES ($1,$2,$3)`)
+	if err != nil {
+		return like, fmt.Errorf("create like in repository error: %w", err)
+	}
+
+	_, err = queryForLike.Exec(like.UserID, like.PostID, like.Status)
+	if err != nil {
+		return like, fmt.Errorf("create like in repository error: %v", err)
+	}
+	switch like.Status {
+	case models.NoLike:
+		break
+	case models.Like:
+		p.IncrementLikeForPostByPostID(like.PostID)
+	case models.DisLike:
+		p.DecrementLikeForPostByPostID(like.PostID)
+	}
+
+	return like, nil
+}
+
+func (p *PostStorage) UpdateCommentLikeStatus(like models.LikeComments) (models.LikeComments, error) {
+	records := ("UPDATE likeComments SET status = $1 WHERE commentsID = $2")
+
+	query, err := p.db.Prepare(records)
+	if err != nil {
+		return like, fmt.Errorf("UpdateCommentLikeStatus error: %v", err)
+	}
+
+	_, err = query.Exec(like.Status, like.CommentsID)
+	if err != nil {
+		return like, fmt.Errorf("UpdateCommentLikeStatus error: %v", err)
+	}
+
+	switch like.Status {
+	case models.NoLike:
+		break
+	case models.Like:
+		p.IncrementLikeForPostByPostID(like.CommentsID)
+	case models.DisLike:
+		p.DecrementLikeForPostByPostID(like.CommentsID)
+	}
+
+	return like, nil
+}
+
+func (p *PostStorage) UpdatePostLikeStatus(like models.LikePost) (models.LikePost, error) {
 	records := ("UPDATE likePost SET status = $1 WHERE postID = $2")
 
 	query, err := p.db.Prepare(records)
 	if err != nil {
-		return like, fmt.Errorf("Add like in repository: %w", PrepareNotCorrect)
+		return like, fmt.Errorf("UpdatePostLikeStatus error: %v", err)
 	}
 
 	_, err = query.Exec(like.Status, like.PostID)
 	if err != nil {
-		return like, fmt.Errorf("Add like in repository: %w", UniqueConstraintFailed)
+		return like, fmt.Errorf("UpdatePostLikeStatus error: %v", err)
 	}
 
-	fmt.Println("Add like is successfully!")
+	switch like.Status {
+	case models.NoLike:
+		break
+	case models.Like:
+		p.IncrementLikeForPostByPostID(like.PostID)
+	case models.DisLike:
+		p.DecrementLikeForPostByPostID(like.PostID)
+	}
+
 	return like, nil
 }
 
-func (p *PostStorage) CheckLikeByPostAndUserID(like models.LikePost) (bool, error) {
+func (p *PostStorage) GetLikeStatusByCommentAndUserID(like models.LikeComments) (models.LikeStatus, error) {
+	stmt := `SELECT status FROM likeComments WHERE userID == $1 AND commentID == $2`
+
+	query, err := p.db.Prepare(stmt)
+	if err != nil {
+		return models.NoLike, err
+	}
+	res := query.QueryRow(like.UserID, like.CommentsID)
+	var status models.LikeStatus
+	err = res.Scan(&status)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.NoLike, nil
+		}
+		return models.NoLike, err
+	}
+	return status, nil
+}
+
+func (p *PostStorage) GetLikeStatusByPostAndUserID(like models.LikePost) (models.LikeStatus, error) {
 	stmt := `SELECT status FROM likePost WHERE userID == $1 AND postID == $2`
 
 	query, err := p.db.Prepare(stmt)
 	if err != nil {
-		return false, err
+		return models.NoLike, err
 	}
 	res := query.QueryRow(like.UserID, like.PostID)
-	err = res.Err()
+	var status models.LikeStatus
+	err = res.Scan(&status)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return false, nil
+			return models.NoLike, nil
 		}
-		return false, err
+		return models.NoLike, err
 	}
-	return true, nil
+	return status, nil
 }
 
 func (p *PostStorage) GetUUIDbyUser(like models.LikePost) int {
@@ -176,6 +257,58 @@ func (p *PostStorage) GetUUIDbyUser(like models.LikePost) int {
 		return temp.PostID
 	}
 	return temp.PostID
+}
+
+func (p *PostStorage) IncrementLikeForPostByPostID(postID int) error {
+	stmt := `UPDATE post SET like = like + 1 WHERE id == $1;`
+	query, err := p.db.Prepare(stmt)
+	if err != nil {
+		return err
+	}
+	_, err = query.Exec(postID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PostStorage) DecrementLikeForPostByPostID(postID int) error {
+	stmt := `UPDATE post SET like = like - 1 WHERE id == $1;`
+	query, err := p.db.Prepare(stmt)
+	if err != nil {
+		return err
+	}
+	_, err = query.Exec(postID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PostStorage) IncrementLikeForPostByCommentsID(commentID int) error {
+	stmt := `UPDATE comments SET like = like + 1 WHERE id == $1;`
+	query, err := p.db.Prepare(stmt)
+	if err != nil {
+		return err
+	}
+	_, err = query.Exec(commentID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PostStorage) DecrementLikeForPostByCommentsID(commentID int) error {
+	stmt := `UPDATE comments SET like = like - 1 WHERE id == $1;`
+	query, err := p.db.Prepare(stmt)
+	if err != nil {
+		return err
+	}
+	_, err = query.Exec(commentID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // func (p *PostStorage) CounterLike() int {

@@ -10,5 +10,8 @@ type LikePost struct {
 
 type LikeStatus int
 
-const Like LikeStatus = 1
-const DisLike LikeStatus = -1
+const (
+	Like    LikeStatus = 1
+	DisLike LikeStatus = -1
+	NoLike  LikeStatus = 0
+)

@@ -31,7 +31,8 @@ type Post interface {
 	UpdatePostService(post models.Post) (int, error)
 	DeletePostService(post models.Post) (int, error)
 	// CreateLikeTable(like models.LikePost) (models.LikePost, error)
-	LikeInService(like models.LikePost) (models.LikePost, error)
+	LikePost(like models.LikePost) (models.LikePost, error)
+	LikeComment(like models.LikeComments) (models.LikeComments, error)
 	// CounterLikeInService() int
 }
 
