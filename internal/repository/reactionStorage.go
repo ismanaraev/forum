@@ -96,7 +96,7 @@ func (r *ReactionsStorage) GetLikeStatusByPostAndUserID(like models.LikePost) (m
 }
 
 func (r *ReactionsStorage) GetLikeStatusByCommentAndUserID(like models.LikeComment) (models.LikeStatus, error) {
-	stmt := `SELECT status FROM likeComments WHERE userID == $1 AND commentID == $2`
+	stmt := `SELECT status FROM likeComments WHERE userID == $1 AND commentsID == $2`
 	query, err := r.db.Prepare(stmt)
 	if err != nil {
 		return models.NoLike, fmt.Errorf("[ReactionStorage]:Error with GetLikeStatusByCommentAndUserID method in repository: %v", err)

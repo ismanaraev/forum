@@ -33,7 +33,7 @@ func (c *CommentStorage) CreateComments(com models.Comment) (int, error) {
 }
 
 func (c *CommentStorage) GetAllComments() ([]models.Comment, error) {
-	row, err := c.db.Query("SELECT postID,content,author,like,dislike,createdat FROM comments")
+	row, err := c.db.Query("SELECT id, postID,content,author,like,dislike,createdat FROM comments")
 	if err != nil {
 		return nil, fmt.Errorf("[CommentStorage]:Error with GetAllComments method in repository: %w", err)
 	}
@@ -52,7 +52,7 @@ func (c *CommentStorage) GetAllComments() ([]models.Comment, error) {
 }
 
 func (c *CommentStorage) GetCommentsByID(postID int) ([]models.Comment, error) {
-	row, err := c.db.Query("SELECT postID,content,author,like,dislike,createdat FROM comments WHERE postID=$1", postID)
+	row, err := c.db.Query("SELECT id,postID,content,author,like,dislike,createdat FROM comments WHERE postID=$1", postID)
 	if err != nil {
 		return nil, fmt.Errorf("[CommentStorage]:Error with GetCommentsByID method in repository: %w", err)
 	}
@@ -61,7 +61,7 @@ func (c *CommentStorage) GetCommentsByID(postID int) ([]models.Comment, error) {
 	allComments := []models.Comment{}
 
 	for row.Next() {
-		err := row.Scan(&temp.PostID, &temp.Content, &temp.Author, &temp.Like, &temp.Dislike, &temp.CreatedAt)
+		err := row.Scan(&temp.ID, &temp.PostID, &temp.Content, &temp.Author, &temp.Like, &temp.Dislike, &temp.CreatedAt)
 		if err != nil {
 			return nil, fmt.Errorf("[CommentStorage]:Error with GetCommentsByID method in repository: %w", err)
 		}

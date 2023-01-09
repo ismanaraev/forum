@@ -40,7 +40,8 @@ const (
 		FOREIGN KEY (postID) REFERENCES post(id) ON DELETE CASCADE,
 		FOREIGN KEY (author) REFERENCES users(username) ON DELETE CASCADE
 	);`
-	vote_table = `CREATE TABLE IF NOT EXISTS likePost (
+
+	likePostTable = `CREATE TABLE IF NOT EXISTS likePost (
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		userID TEXT,
 		postID INTEGER DEFAULT 0,
@@ -48,7 +49,8 @@ const (
 		FOREIGN KEY (userID) REFERENCES users(uuid) ON DELETE CASCADE,
 		FOREIGN KEY (postID) REFERENCES post(id) ON DELETE CASCADE
 		);`
-	like_table = `CREATE TABLE IF NOT EXISTS likeComments(
+
+	likeCommentsTable = `CREATE TABLE IF NOT EXISTS likeComments(
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		userID TEXT,
 		commentsID INTEGER DEFAULT 0,
@@ -60,7 +62,7 @@ const (
 
 // Создание таблицы пользователя
 func CreatTables(db *sql.DB) error {
-	allTables := []string{users_table, post_table, comments_table, vote_table, like_table}
+	allTables := []string{users_table, post_table, comments_table, likePostTable, likeCommentsTable}
 	for _, v := range allTables {
 		stmt, err := db.Prepare(v)
 		if err != nil {

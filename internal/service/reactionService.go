@@ -54,9 +54,9 @@ func (r *ReactionsService) LikeCommentService(like models.LikeComment) (models.L
 		}
 		switch like.Status {
 		case models.Like:
-			r.repo.IncrementPostLikeByPostID(like.CommentsID)
+			r.repo.IncrementCommentLikeByCommentsID(like.CommentsID)
 		case models.DisLike:
-			r.repo.IncrementPostDislikeByPostID(like.CommentsID)
+			r.repo.IncrementCommentDislikeByCommentsID(like.CommentsID)
 		}
 	} else {
 		if status != like.Status {
@@ -92,17 +92,17 @@ func (r *ReactionsService) addLikePost(like models.LikePost, prev models.LikeSta
 func (r *ReactionsService) addLikeComment(like models.LikeComment, prev models.LikeStatus) error {
 	switch like.Status {
 	case models.Like:
-		err := r.repo.IncrementPostLikeByPostID(like.CommentsID)
+		err := r.repo.IncrementCommentLikeByCommentsID(like.CommentsID)
 		if err != nil {
 			return err
 		}
-		return r.repo.DecrementPostDislikeByPostID(like.CommentsID)
+		return r.repo.DecrementCommentDislikeByCommentsID(like.CommentsID)
 	case models.DisLike:
-		err := r.repo.DecrementPostLikeByPostID(like.CommentsID)
+		err := r.repo.DecrementCommentLikeByCommentsID(like.CommentsID)
 		if err != nil {
 			return err
 		}
-		return r.repo.IncrementPostDislikeByPostID(like.CommentsID)
+		return r.repo.IncrementCommentDislikeByCommentsID(like.CommentsID)
 	}
 	return nil
 }

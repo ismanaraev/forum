@@ -26,6 +26,7 @@ func (h *Handler) InitRoutes() {
 	router.HandleFunc("/logout", h.IsAuthorized(h.logOutHandler))
 	router.HandleFunc("/create-post", h.IsAuthorized(h.createPost))
 	router.HandleFunc("/comments/", h.comment)
+	router.HandleFunc("/like-comment", h.LikeComment)
 	router.HandleFunc("/myprofile", h.myprofile)
 
 	router.Handle("/template/", http.StripPrefix("/template/", http.FileServer(http.Dir("../internal/template/"))))

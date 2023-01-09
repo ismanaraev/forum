@@ -120,9 +120,49 @@ func (h *Handler) comment(w http.ResponseWriter, r *http.Request) {
 			Comment:  allComments,
 			LikePost: likeReaction,
 		}
-		html.Execute(w, result)
+		err = html.Execute(w, result)
+		if err != nil {
+			log.Print(err)
+		}
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
+}
+
+func (h *Handler) LikeComment(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "aboba", http.StatusMethodNotAllowed)
+		return
+	}
+	token, err := r.Cookie("session_name")
+	if err != nil {
+		log.Printf("error token: %v", err)
+		return
+	}
+	uuid, err := h.service.GetSessionService(token.Value)
+	if err != nil {
+		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
+		return
+	}
+	comment := r.FormValue("CommentID")
+	commentID, err := strconv.Atoi(comment)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	status := models.Like
+
+	like := models.LikeComment{
+		UserID:     uuid,
+		CommentsID: commentID,
+		Status:     status,
+	}
+
+	res, err := h.service.Reactions.LikeCommentService(like)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	log.Printf("aboba success %v", res)
 }
