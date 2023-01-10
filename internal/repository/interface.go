@@ -26,12 +26,13 @@ type User interface {
 
 type Post interface {
 	GetAllPost() ([]models.Post, error)
-	GetPostByID(id int) (models.Post, error)
+	GetPostByID(id int64) (models.Post, error)
 	GetUsersPost(uuid uuid.UUID) ([]models.Post, error)
 	GetPostWithCategory(category string) ([]models.Post, error)
-	GetPostIdWithUUID(uuid uuid.UUID) ([]int, error)
-	CreatePost(post models.Post) (int, error)
-	GetUsersLikePosts(i []int) ([]models.Post, error)
+	GetPostIdWithUUID(uuid uuid.UUID) ([]int64, error)
+	CreatePost(post models.Post) (int64, error)
+	GetUsersLikePosts(i []int64) ([]models.Post, error)
+	UpdatePost(models.Post) error
 }
 
 type Session interface {
@@ -41,26 +42,24 @@ type Session interface {
 
 type Comments interface {
 	GetAllComments() ([]models.Comment, error)
-	GetCommentsByID(postID int) ([]models.Comment, error)
-	CreateComments(models.Comment) (int, error)
+	GetCommentsByID(postID int64) ([]models.Comment, error)
+	GetCommentByCommentID(commentID int) (models.Comment, error)
+	CreateComments(models.Comment) error
+	UpdateComment(models.Comment) error
 }
 
 type Reactions interface {
 	CreateLikeForPost(like models.LikePost) (models.LikePost, error)
 	CreateLikeForComment(like models.LikeComment) (models.LikeComment, error)
-	UpdatePostLikeStatus(like models.LikePost) (models.LikePost, error)
-	UpdateCommentLikeStatus(like models.LikeComment) (models.LikeComment, error)
-	GetUserIDfromLikePost(like models.LikePost) (int, error)
+	UpdatePostLikeStatus(like models.LikePost) error
+	UpdateCommentLikeStatus(like models.LikeComment) error
+	GetUserIDfromLikePost(like models.LikePost) (int64, error)
 	GetLikeStatusByPostAndUserID(like models.LikePost) (models.LikeStatus, error)
 	GetLikeStatusByCommentAndUserID(like models.LikeComment) (models.LikeStatus, error)
-	IncrementPostLikeByPostID(postID int) error
-	DecrementPostLikeByPostID(postID int) error
-	IncrementPostDislikeByPostID(postID int) error
-	DecrementPostDislikeByPostID(postID int) error
-	IncrementCommentLikeByCommentsID(commentID int) error
-	DecrementCommentLikeByCommentsID(commentID int) error
-	DecrementCommentDislikeByCommentsID(commentID int) error
-	IncrementCommentDislikeByCommentsID(commentID int) error
+	CheckIfLikePostExistByPostAndUserID(like models.LikePost) (bool, error)
+
+	DeletePostLike(models.LikePost) error
+	DeleteCommentLike(models.LikeComment) error
 }
 
 func NewRepository(db *sql.DB) Repository {

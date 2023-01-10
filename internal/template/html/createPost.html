@@ -10,7 +10,7 @@
 <body>
     <h1 style="text-align:center;">Create Post</h1>
 
-    <form class="form" method="POST">
+    <form action="/create-post" class="form" method="POST">
         <div class="field">
             <textarea class="title" required type="text" placeholder="Title" name="title"></textarea>
             <textarea class="content" required type="text" placeholder="Content" name="content"></textarea>
@@ -19,27 +19,27 @@
         <fieldset>
             <legend>Choose category</legend>
             <div>
-              <input type="checkbox" name="chooseCategory" value="coding" />
+              <input type="checkbox" name="categories" value="coding" />
               <label for="coding">Coding</label>
             </div>
             <div>
-              <input type="checkbox" name="chooseCategory" value="music" />
+              <input type="checkbox" name="categories" value="music" />
               <label for="music">Music</label>
             </div>
             <div>
-              <input type="checkbox" name="chooseCategory" value="art" />
+              <input type="checkbox" name="categories" value="art" />
               <label for="art">Art</label>
             </div>
             <div>
-              <input type="checkbox"  name="chooseCategory" value="sports" />
+              <input type="checkbox"  name="categories" value="sports" />
               <label for="sports">Sports</label>
             </div>
             <div>
-              <input type="checkbox" name="chooseCategory" value="cooking" />
+              <input type="checkbox" name="categories" value="cooking" />
               <label for="cooking">Cooking</label>
             </div>
             <div>
-                <input type="checkbox" name="chooseCategory" value="other" />
+                <input type="checkbox" name="categories" value="other" />
                 <label for="cooking">Other</label>
             </div>
 

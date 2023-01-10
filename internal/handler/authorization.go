@@ -17,7 +17,7 @@ func (h *Handler) userSignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	switch r.Method {
 	case http.MethodGet:
-		html, err := template.ParseFiles("../internal/template/html/signIn.html")
+		html, err := template.ParseFiles(TemplateDir + "html/signIn.html")
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
@@ -65,7 +65,7 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 	}
 	switch r.Method {
 	case http.MethodGet:
-		html, err := template.ParseFiles("../internal/template/html/signUp.html")
+		html, err := template.ParseFiles(TemplateDir + "html/signUp.html")
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return

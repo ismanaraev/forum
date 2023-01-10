@@ -24,11 +24,11 @@ type User interface {
 }
 
 type Post interface {
-	CreatePostService(post models.Post) (int, error)
+	CreatePostService(post models.Post) (int64, error)
 	GetAllPostService(category string) ([]models.Post, error)
 	GetUsersPostInService(uuid uuid.UUID) ([]models.Post, error)
 	GetUserLikePostsInService(uuid uuid.UUID) ([]models.Post, error)
-	GetPostByIDinService(id int) (models.Post, error)
+	GetPostByIDinService(id int64) (models.Post, error)
 }
 
 type Session interface {
@@ -38,13 +38,13 @@ type Session interface {
 
 type Comments interface {
 	GetAllCommentsInService() ([]models.Comment, error)
-	GetCommentsByIDinService(postID int) ([]models.Comment, error)
-	CreateCommentsInService(com models.Comment) (int, error)
+	GetCommentsByIDinService(postID int64) ([]models.Comment, error)
+	CreateCommentsInService(com models.Comment) error
 }
 
 type Reactions interface {
-	LikePostService(like models.LikePost) (models.LikePost, error)
-	LikeCommentService(like models.LikeComment) (models.LikeComment, error)
+	LikePostService(like models.LikePost) error
+	LikeCommentService(like models.LikeComment) error
 }
 
 func NewService(repo repository.Repository) Service {
@@ -53,6 +53,6 @@ func NewService(repo repository.Repository) Service {
 		Post:      NewPostService(repo.Post),
 		Session:   NewSessionService(repo.Session),
 		Comments:  NewCommentsService(repo.Comments),
-		Reactions: NewReactionsService(repo.Reactions),
+		Reactions: NewReactionsService(repo.Reactions, repo.Post, repo.Comments),
 	}
 }

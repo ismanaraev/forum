@@ -30,7 +30,7 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		html, err := template.ParseFiles("../internal/template/html/myprofile.html")
+		html, err := template.ParseFiles(TemplateDir + "html/myprofile.html")
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return

@@ -17,7 +17,7 @@ func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-	html, err := template.ParseFiles("../internal/template/html/index.html")
+	html, err := template.ParseFiles(TemplateDir + "html/index.html")
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -38,7 +38,7 @@ func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 		return
 
 	} else if r.Method == http.MethodGet {
-		html, err := template.ParseFiles("../internal/template/html/index.html")
+		html, err := template.ParseFiles(TemplateDir + "html/index.html")
 		data := &models.User{}
 		// по токену запрашиваем почту пользователя
 		data.Uuid, err = h.service.GetSessionService(token.Value)

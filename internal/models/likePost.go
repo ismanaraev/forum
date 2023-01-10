@@ -12,6 +12,6 @@ const (
 
 type LikePost struct {
 	UserID uuid.UUID  `json:"userid"`
-	PostID int        `json:"postid"`
+	PostID int64      `json:"postid"`
 	Status LikeStatus `json:"status"`
 }

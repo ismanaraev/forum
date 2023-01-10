@@ -16,9 +16,12 @@
                 <br>
                 <p>Category:{{ .Post.Categories }}</p> 
 
-                <form method="POST">
-                    <button class="btn-like" name="like" type="submit" value="1">Like</button>
-                    <button class="btn-dislike" name="dislike" type="submit" value="-1">Dislike</button>
+                <form action="/like-post" method="POST">
+                    <input type="hidden" name="postID" value="{{.Post.ID}}">
+                    <button class="btn-like" name="status" type="submit" value="1">Like</button>
+                    <p>{{.Post.Like}}</p>
+                    <button class="btn-dislike" name="status" type="submit" value="-1">Dislike</button>
+                    <p>{{.Post.Dislike}}</p>
                 </form>
 
                 
@@ -30,16 +33,20 @@
                                  {{ .Content }}
                     </fieldset>
 		    <form action="/like-comment" method="POST"> 
-			    <button class="btn-like" name="like" type="submit" value="1">Like</button>
-			    <button class="btn-dislike" name="dislike" type="submit" value="-1">Dislike</button>
-			    <input type="hidden" name="CommentID" value={{.ID}}>
+			    <button class="btn-like" name="status" type="submit" value="1">Like</button>
+                <p>{{.Like}}</p>
+			    <button class="btn-dislike" name="status" type="submit" value="-1">Dislike</button>
+                <p>{{.Dislike}}</p>
+			    <input type="hidden" name="commentID" value={{.ID}}>
+                <input type="hidden" name="postID" value="{{.PostID}}">
 		    </form>
                 {{ end }}
         </fieldset>
              <br>
 
-             <form action="/comment/{{.Post.Id}}" method="POST">
-             <textarea class="comments-class" type="txt" name="commentsS"></textarea>
+             <form action="/create-comment" method="POST">
+             <input type="hidden" value="{{.Post.ID}}" name="postID">
+             <textarea class="comments-class" type="txt" name="content"></textarea>
              <br>
              <button class="btn-comments" type="submit">Отправить</button>
              <br>

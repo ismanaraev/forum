@@ -13,13 +13,12 @@ func (h *Handler) IsAuthorized(next http.HandlerFunc) http.HandlerFunc {
 			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
-		// по токену запрашиваем почту пользователя
+		// по токену запрашиваем uuid пользователя
 		uuid, err := h.service.GetSessionService(token.Value)
 		if err != nil {
 			log.Fatalf("Get session from handler don`t work %e", err)
 		}
-		uuidString := uuid.String()
-		ctx := context.WithValue(r.Context(), "uuid", uuidString)
+		ctx := context.WithValue(r.Context(), "uuid", uuid)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }

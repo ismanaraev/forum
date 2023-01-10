@@ -19,10 +19,10 @@ func (c *CommentService) GetAllCommentsInService() ([]models.Comment, error) {
 	return c.repo.GetAllComments()
 }
 
-func (c *CommentService) GetCommentsByIDinService(postID int) ([]models.Comment, error) {
+func (c *CommentService) GetCommentsByIDinService(postID int64) ([]models.Comment, error) {
 	return c.repo.GetCommentsByID(postID)
 }
 
-func (c *CommentService) CreateCommentsInService(com models.Comment) (int, error) {
+func (c *CommentService) CreateCommentsInService(com models.Comment) error {
 	return c.repo.CreateComments(com)
 }

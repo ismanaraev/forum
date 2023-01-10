@@ -56,7 +56,7 @@ const (
 		commentsID INTEGER DEFAULT 0,
 		status INTEGER DEFAULT 0,
 		FOREIGN KEY (userID) REFERENCES users(uuid) ON DELETE CASCADE,
-		FOREIGN KEY (commentsID) REFERENCES post(id) ON DELETE CASCADE
+		FOREIGN KEY (commentsID) REFERENCES comments(id) ON DELETE CASCADE
 		);`
 )
 

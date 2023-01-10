@@ -6,103 +6,124 @@ import (
 )
 
 type ReactionsService struct {
-	repo repository.Reactions
+	repo        repository.Reactions
+	postRepo    repository.Post
+	commentRepo repository.Comments
 }
 
-func NewReactionsService(repo repository.Reactions) *ReactionsService {
+func NewReactionsService(repo repository.Reactions, postRepo repository.Post, commentRepo repository.Comments) *ReactionsService {
 	return &ReactionsService{
-		repo: repo,
+		repo:        repo,
+		postRepo:    postRepo,
+		commentRepo: commentRepo,
 	}
 }
 
-func (r *ReactionsService) LikePostService(like models.LikePost) (models.LikePost, error) {
+func (r *ReactionsService) LikePostService(like models.LikePost) error {
 	status, err := r.repo.GetLikeStatusByPostAndUserID(like)
 	if err != nil {
-		return models.LikePost{}, err
+		return err
 	}
-	if status == models.NoLike {
-		if _, err := r.repo.CreateLikeForPost(like); err != nil {
-			return models.LikePost{}, err
-		}
-		switch like.Status {
-		case models.Like:
-			r.repo.IncrementPostLikeByPostID(like.PostID)
-		case models.DisLike:
-			r.repo.IncrementPostDislikeByPostID(like.PostID)
-		}
-	} else {
-		if status != like.Status {
-			if _, err := r.repo.UpdatePostLikeStatus(like); err != nil {
-				return models.LikePost{}, err
-			}
-			if err := r.addLikePost(like, status); err != nil {
-				return models.LikePost{}, err
-			}
-		}
-	}
-	return like, nil
-}
-
-func (r *ReactionsService) LikeCommentService(like models.LikeComment) (models.LikeComment, error) {
-	status, err := r.repo.GetLikeStatusByCommentAndUserID(like)
+	post, err := r.postRepo.GetPostByID(like.PostID)
 	if err != nil {
-		return models.LikeComment{}, err
+		return err
 	}
 	if status == models.NoLike {
-		if _, err := r.repo.CreateLikeForComment(like); err != nil {
-			return models.LikeComment{}, err
+		_, err := r.repo.CreateLikeForPost(like)
+		if err != nil {
+			return err
 		}
 		switch like.Status {
 		case models.Like:
-			r.repo.IncrementCommentLikeByCommentsID(like.CommentsID)
+			post.Like += 1
 		case models.DisLike:
-			r.repo.IncrementCommentDislikeByCommentsID(like.CommentsID)
+			post.Dislike += 1
 		}
-	} else {
-		if status != like.Status {
-			if _, err := r.repo.UpdateCommentLikeStatus(like); err != nil {
-				return models.LikeComment{}, err
-			}
-			if err := r.addLikeComment(like, status); err != nil {
-				return models.LikeComment{}, err
-			}
-		}
+		return r.postRepo.UpdatePost(post)
 	}
-	return like, nil
-}
-
-func (r *ReactionsService) addLikePost(like models.LikePost, prev models.LikeStatus) error {
-	switch like.Status {
-	case models.Like:
-		err := r.repo.IncrementPostLikeByPostID(like.PostID)
-		if err != nil {
+	if status == like.Status {
+		switch like.Status {
+		case models.Like:
+			post.Like -= 1
+		case models.DisLike:
+			post.Dislike -= 1
+		}
+		if err := r.repo.DeletePostLike(like); err != nil {
 			return err
 		}
-		return r.repo.DecrementPostDislikeByPostID(like.PostID)
-	case models.DisLike:
-		err := r.repo.DecrementPostLikeByPostID(like.PostID)
-		if err != nil {
+		return r.postRepo.UpdatePost(post)
+	}
+	if status != like.Status {
+		switch like.Status {
+		case models.Like:
+			post.Like += 1
+			post.Dislike -= 1
+		case models.DisLike:
+			post.Like -= 1
+			post.Dislike += 1
+		}
+		if err := r.postRepo.UpdatePost(post); err != nil {
 			return err
 		}
-		return r.repo.IncrementPostDislikeByPostID(like.PostID)
+		return r.repo.UpdatePostLikeStatus(like)
 	}
 	return nil
 }
 
-func (r *ReactionsService) addLikeComment(like models.LikeComment, prev models.LikeStatus) error {
-	switch like.Status {
-	case models.Like:
-		err := r.repo.IncrementCommentLikeByCommentsID(like.CommentsID)
-		if err != nil {
-			return err
-		}
-		return r.repo.DecrementCommentDislikeByCommentsID(like.CommentsID)
-	case models.DisLike:
-		err := r.repo.DecrementCommentLikeByCommentsID(like.CommentsID)
-		if err != nil {
-			return err
-		}
-		return r.repo.IncrementCommentDislikeByCommentsID(like.CommentsID)
+func (r *ReactionsService) LikeCommentService(like models.LikeComment) error {
+	status, err := r.repo.GetLikeStatusByCommentAndUserID(like)
+	if err != nil {
+		return err
 	}
+	comment, err := r.commentRepo.GetCommentByCommentID(like.CommentsID)
+	if err != nil {
+		return err
+	}
+	if status == models.NoLike {
+		if _, err := r.repo.CreateLikeForComment(like); err != nil {
+			return err
+		}
+		switch like.Status {
+		case models.Like:
+			comment.Like += 1
+		case models.DisLike:
+			comment.Dislike += 1
+		}
+		err := r.commentRepo.UpdateComment(comment)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	if status == like.Status {
+		switch like.Status {
+		case models.Like:
+			comment.Like -= 1
+		case models.DisLike:
+			comment.Dislike -= 1
+		}
+		if err := r.commentRepo.UpdateComment(comment); err != nil {
+			return err
+		}
+		if err := r.repo.DeleteCommentLike(like); err != nil {
+			return err
+		}
+	}
+	if status != like.Status {
+		switch like.Status {
+		case models.Like:
+			comment.Like += 1
+			comment.Dislike -= 1
+		case models.DisLike:
+			comment.Like -= 1
+			comment.Dislike += 1
+		}
+		if err := r.commentRepo.UpdateComment(comment); err != nil {
+			return err
+		}
+		return r.repo.UpdateCommentLikeStatus(like)
+	}
+
 	return nil
 }

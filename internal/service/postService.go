@@ -17,7 +17,7 @@ func NewPostService(repo repository.Post) *PostService {
 	}
 }
 
-func (p *PostService) CreatePostService(post models.Post) (int, error) {
+func (p *PostService) CreatePostService(post models.Post) (int64, error) {
 	return p.repo.CreatePost(post)
 }
 
@@ -29,7 +29,7 @@ func (p *PostService) GetAllPostService(category string) ([]models.Post, error) 
 	}
 }
 
-func (p *PostService) GetPostByIDinService(id int) (models.Post, error) {
+func (p *PostService) GetPostByIDinService(id int64) (models.Post, error) {
 	return p.repo.GetPostByID(id)
 }
 
