@@ -1,34 +1,31 @@
 package handler
 
 import (
-	"forum3/internal/models"
-	"html/template"
+	"forumv2/internal/models"
 	"log"
 	"net/http"
+	"text/template"
 )
 
 type AllData struct {
-	Data models.Auth
+	Data models.User
 	Post []models.Post
 }
 
-func (h *Handler) homepage(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/homepage" {
+func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-
-	html, err := template.ParseFiles("../internal/template/html/homepage.html")
+	html, err := template.ParseFiles("../internal/template/html/index.html")
 	if err != nil {
-
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-
 	token, err := r.Cookie("session_name")
-
 	if err != nil {
-		postData, err := h.service.GetAllPostService()
+		category := r.FormValue("category")
+		postData, err := h.service.GetAllPostService(category)
 		if err != nil {
 			log.Fatalf("Get all post from handler don`t work %e", err)
 		}
@@ -38,38 +35,33 @@ func (h *Handler) homepage(w http.ResponseWriter, r *http.Request) {
 		}
 
 		html.Execute(w, result)
+		return
 
 	} else if r.Method == http.MethodGet {
-
-		html, err := template.ParseFiles("../internal/template/html/homepage.html")
-		data := &models.Auth{}
-
+		html, err := template.ParseFiles("../internal/template/html/index.html")
+		data := &models.User{}
 		// по токену запрашиваем почту пользователя
-		data.Uuid, err = h.service.GetSessionRQtoRepo(token.Value)
+		data.Uuid, err = h.service.GetSessionService(token.Value)
 		if err != nil {
 			http.Redirect(w, r, "/sign-up", http.StatusSeeOther)
 			return
 		}
-
-		userInfo, err := h.service.GetUsersInfoByUUIDtoRepo(data.Uuid)
+		userInfo, err := h.service.GetUsersInfoByUUIDService(data.Uuid)
 		if err != nil {
 			log.Fatalf("Get user info from handler don`t work %e", err)
 		}
-
-		postData, err := h.service.GetAllPostService()
+		category := r.FormValue("category")
+		postData, err := h.service.GetAllPostService(category)
 		if err != nil {
 			log.Fatalf("Get all post from handler don`t work %e", err)
 		}
-
 		result := &AllData{
 			Data: userInfo,
 			Post: postData,
 		}
-
 		html.Execute(w, result)
 	} else {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
-
 	}
 }

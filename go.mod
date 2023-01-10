@@ -1,4 +1,4 @@
-module forum3
+module forumv2
 
 go 1.19
 

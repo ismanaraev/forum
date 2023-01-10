@@ -2,12 +2,6 @@ package models
 
 import "github.com/gofrs/uuid"
 
-type LikePost struct {
-	UserID uuid.UUID  `json:"userid"`
-	PostID int        `json:"postid"`
-	Status LikeStatus `json:"status"`
-}
-
 type LikeStatus int
 
 const (
@@ -15,3 +9,9 @@ const (
 	DisLike LikeStatus = -1
 	NoLike  LikeStatus = 0
 )
+
+type LikePost struct {
+	UserID uuid.UUID  `json:"userid"`
+	PostID int        `json:"postid"`
+	Status LikeStatus `json:"status"`
+}

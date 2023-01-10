@@ -1,7 +1,7 @@
 package service
 
 import (
-	"forum3/internal/repository"
+	"forumv2/internal/repository"
 
 	"github.com/gofrs/uuid"
 )
@@ -18,8 +18,8 @@ func NewSessionService(repo repository.Session) *SessionService {
 
 // RQ-request
 // Запрос на удаления токена и время токена
-func (s *SessionService) DeleteSessionRQtoRepo(r uuid.UUID) error {
-	err := s.repo.DeleteSessionFromDB(r)
+func (s *SessionService) DeleteSessionService(uuid uuid.UUID) error {
+	err := s.repo.DeleteSessionFromDB(uuid)
 	if err != nil {
 		return err
 	}
@@ -27,7 +27,7 @@ func (s *SessionService) DeleteSessionRQtoRepo(r uuid.UUID) error {
 }
 
 // Получаем по токену username
-func (s *SessionService) GetSessionRQtoRepo(token string) (uuid.UUID, error) {
+func (s *SessionService) GetSessionService(token string) (uuid.UUID, error) {
 	uuid, err := s.repo.GetSessionFromDB(token)
 	if err != nil {
 		return uuid, err

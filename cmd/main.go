@@ -1,10 +1,10 @@
 package main
 
 import (
-	db "forum3/db/SQLite"
-	"forum3/internal/handler"
-	"forum3/internal/repository"
-	"forum3/internal/service"
+	db "forumv2/db/SQLite3"
+	"forumv2/internal/handler"
+	"forumv2/internal/repository"
+	"forumv2/internal/service"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"

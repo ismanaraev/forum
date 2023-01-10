@@ -6,7 +6,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type Auth struct {
+type User struct {
 	Uuid       uuid.UUID `json:"uuid"`
 	Name       string    `json:"name"`
 	Username   string    `json:"username"`

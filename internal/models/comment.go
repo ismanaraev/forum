@@ -1,6 +1,6 @@
 package models
 
-type Comments struct {
+type Comment struct {
 	PostID    int    `json:"postid"`
 	Author    string `json:"author"`
 	Content   string `json:"content"`

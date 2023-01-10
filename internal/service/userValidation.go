@@ -1,7 +1,7 @@
 package service
 
 import (
-	"forum3/internal/models"
+	"forumv2/internal/models"
 	"net/mail"
 
 	"golang.org/x/crypto/bcrypt"
@@ -41,7 +41,7 @@ func checkName(name string) bool {
 	return true
 }
 
-func checkValid(user models.Auth) bool {
+func userValidation(user models.User) bool {
 	if !checkName(user.Name) {
 		return false
 	} else if !checkPassword(user.Password) {

@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"forum3"
-	"forum3/internal/service"
+	"forumv2"
+	"forumv2/internal/service"
 	"log"
 	"net/http"
 )
@@ -20,21 +20,17 @@ func NewHandler(service service.Service) *Handler {
 func (h *Handler) InitRoutes() {
 	router := http.NewServeMux()
 
-	router.HandleFunc("/homepage", h.homepage)
+	router.HandleFunc("/", h.index)
 	router.HandleFunc("/sign-in", h.userSignIn)
 	router.HandleFunc("/sign-up", h.userSignUp)
 	router.HandleFunc("/logout", h.IsAuthorized(h.logOutHandler))
-	router.HandleFunc("/post", h.IsAuthorized(h.postPage))
 	router.HandleFunc("/create-post", h.IsAuthorized(h.createPost))
 	router.HandleFunc("/comments/", h.comment)
-	router.HandleFunc("/update-post", h.updatePost)
-	router.HandleFunc("/delete-post", h.deletePost)
+	router.HandleFunc("/myprofile", h.myprofile)
 
 	router.Handle("/template/", http.StripPrefix("/template/", http.FileServer(http.Dir("../internal/template/"))))
-	router.Handle("/template/img/", http.StripPrefix("/template/img/", http.FileServer(http.Dir("/template/img"))))
-
-	srv := new(forum3.Server)
-
+	// router.Handle("/template/img/", http.StripPrefix("/template/img/", http.FileServer(http.Dir("/template/img"))))
+	srv := new(forumv2.Server)
 	if err := srv.Run("8081", router); err != nil {
 		log.Fatalf("error occured while running http server: %s", err.Error())
 	}

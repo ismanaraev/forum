@@ -14,14 +14,12 @@ func (h *Handler) IsAuthorized(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		// по токену запрашиваем почту пользователя
-		uuid, err := h.service.GetSessionRQtoRepo(token.Value)
+		uuid, err := h.service.GetSessionService(token.Value)
 		if err != nil {
 			log.Fatalf("Get session from handler don`t work %e", err)
 		}
-
 		uuidString := uuid.String()
 		ctx := context.WithValue(r.Context(), "uuid", uuidString)
-
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }

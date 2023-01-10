@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/template/css/commentsPage.css">
+    <link rel="stylesheet" type="text/css" href="/template/css/commentPage.css">
     <title>Comments</title>
 </head>
 <body>
@@ -29,7 +29,7 @@
                         <legend>{{ .Author }}</legend> 
                                  {{ .Content }}
                     </fieldset>
-		    <form method="POST"> 
+		    <form action="{{.Id}}" method="POST"> 
 			    <button class="btn-like" name="like" type="submit" value="1">Like</button>
 			    <button class="btn-dislike" name="dislike" type="submit" value="-1">Dislike</button>
 			    <input type="hidden" name="commentID" value={{.ID}}>
@@ -38,7 +38,7 @@
         </fieldset>
              <br>
 
-             <form method="POST">
+             <form action="/comment/{{.Post.Id}}" method="POST">
              <textarea class="comments-class" type="txt" name="commentsS"></textarea>
              <br>
              <button class="btn-comments" type="submit">Отправить</button>

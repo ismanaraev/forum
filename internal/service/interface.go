@@ -1,50 +1,58 @@
 package service
 
 import (
-	"forum3/internal/models"
-	"forum3/internal/repository"
+	"forumv2/internal/models"
+	"forumv2/internal/repository"
 
 	"github.com/gofrs/uuid"
 )
 
 type Service struct {
-	Authorization
+	User
 	Post
 	Session
+	Comments
+	Reactions
 }
 
-type Authorization interface {
-	CreateSession(user models.Auth) (string, error)
-	CreateUserService(user models.Auth) (int, error)
-	AuthorizationUserService(models.Auth) (string, error)
-	GetUserInfoService(user models.Auth) (models.Auth, error)
-	GetUsersInfoByUUIDtoRepo(id uuid.UUID) (models.Auth, error)
+type User interface {
+	CreateSessionService(user models.User) (string, error)
+	CreateUserService(user models.User) (int, error)
+	AuthorizationUserService(models.User) (string, error)
+	GetUserInfoService(user models.User) (models.User, error)
+	GetUsersInfoByUUIDService(id uuid.UUID) (models.User, error)
 }
 
 type Post interface {
-	GetAllPostService() ([]models.Post, error)
-	GetAllCommentsInService() ([]models.Comments, error)
-	CreateCommentsInService(com models.Comments) (int, error)
-	GetPostByIDinService(id int) (models.Post, error)
-	GetCommentsByIDinService(postID int) ([]models.Comments, error)
 	CreatePostService(post models.Post) (int, error)
-	UpdatePostService(post models.Post) (int, error)
-	DeletePostService(post models.Post) (int, error)
-	// CreateLikeTable(like models.LikePost) (models.LikePost, error)
-	LikePost(like models.LikePost) (models.LikePost, error)
-	LikeComment(like models.LikeComments) (models.LikeComments, error)
-	// CounterLikeInService() int
+	GetAllPostService(category string) ([]models.Post, error)
+	GetUsersPostInService(uuid uuid.UUID) ([]models.Post, error)
+	GetUserLikePostsInService(uuid uuid.UUID) ([]models.Post, error)
+	GetPostByIDinService(id int) (models.Post, error)
 }
 
 type Session interface {
-	DeleteSessionRQtoRepo(uuid.UUID) error
-	GetSessionRQtoRepo(token string) (uuid.UUID, error)
+	DeleteSessionService(uuid uuid.UUID) error
+	GetSessionService(token string) (uuid.UUID, error)
+}
+
+type Comments interface {
+	GetAllCommentsInService() ([]models.Comment, error)
+	GetCommentsByIDinService(postID int) ([]models.Comment, error)
+	CreateCommentsInService(com models.Comment) (int, error)
+}
+
+type Reactions interface {
+	LikePostService(like models.LikePost) (models.LikePost, error)
+	LikeCommentService(like models.LikeComment) (models.LikeComment, error)
 }
 
 func NewService(repo repository.Repository) Service {
 	return Service{
-		Authorization: NewAuthService(repo.Authorization),
-		Session:       NewSessionService(repo.Session),
-		Post:          NewPostService(repo.Post),
+		User:      NewUserService(repo.User),
+		Post:      NewPostService(repo.Post),
+		Session:   NewSessionService(repo.Session),
+		Comments:  NewCommentsService(repo.Comments),
+		Reactions: NewReactionsService(repo.Reactions),
 	}
 }
