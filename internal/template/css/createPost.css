@@ -1,14 +1,79 @@
-body{
-    width:900px; /* ширина блока */
-    height: 650px; /* высота блока */
-    background:bisque;
-    border-radius: 10px; /* закругленные углы блока */
-    margin: 6% auto; /* отступ сверху и выравнивание по середине */
-    box-shadow: 2px 2px 4px 0px #000000; /* тень блока */
+
+*{
+    padding:0;
+       margin:0;
+       text-decoration: none;
+       list-style:none;
+       box-sizing: border-box;
     
+    }
+    
+    body{
+        font-family: 'JetBrains Mono', monospace;
+        background: #4c4e4d;
+        color: white;
+        font-size: 15px;
+    }
+    .nav-bar{
+        background: #242524;
+        height: 80px;
+        width: 100%;
+    }
+    .nav-bar ul{
+        float:right;
+        margin-right:20px;
+    }
+    
+    .nav-bar ul li{
+        display: inline-block;  
+        line-height: 80px;
+        margin: 0 5px;
+    }
+    
+    .nav-bar ul li a{
+        color: white;
+        font-size: 17px;
+        padding: 7px 13px;
+        border-radius: 3px;
+        text-transform: uppercase;
+    }
+    .nav-bar ul li a.active, .nav-bar ul li a:hover{
+        background: #4c4e4d;
+        transition: .5s;
+    }
+    label.logo{
+        color: white;
+        font-size: 35px;
+        line-height: 80px;
+        text-transform: capitalize;
+        padding: 0 100px;
+        font-weight: bold;
+    }
+@media (max-width: 953px){
+    label.logo{
+        font-size:30px;
+        padding-left:50px;
+    }
+    .nav-bar ul li{
+        font-size:16px;
+    }
+    .nav-bar ul li a{
+        font-size:16px;
+    }
 }
 
-
+@media (max-width: 600px){
+    .nav-bar{height: 160px;}
+    label.logo{
+        font-size:8px;
+    }
+    .nav-bar ul li{
+        font-size:8px;
+    }
+    .nav-bar ul li a{
+        font-size:8px;
+    }
+}
 
 .title{
     margin-left: 20px;

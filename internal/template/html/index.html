@@ -4,73 +4,69 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/template/css/homepage.css">
+    <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/template/css/index.css">
     <title>homepage</title>
 </head>
-<body>
-    <h1>Homepage</h1>
-
-    {{ if .Data.Username  }}
-
-        {{ .Data.Username }}
+<body> 
+    <nav>   
+        <label class="logo">The Forum</label>
         
-       
-
-    <form class="formCreatePost" action="/create-post" method="GET">
-        <div>
-            <button class="btnCP" >Создать пост</button>
-        </div>
-    </form>
-    
-    <br>
-
-    <form class="formLogout" action="/logout" method="GET">
-        <div>
-            <button class="btnL" >Выйти</button>
-        </div>
-    </form> 
-   
-             {{ else }}
- 
-    <form class="formSign-up" action="/sign-up" method="GET">
-        <div>
-            <button class="btnSup" >Регистрация</button>
-        </div>
-    </form>
-    
-    <form class="formSing-in" action="/sign-in" method="GET">
-        <div>
-            <button class="btnSin" >Авторизация</button>
-        </div>
-    </form>
-    
-
+        {{ if .Data.Username  }}
+        <ul>
+            <li class="username"> {{.Data.Username  }}</li> 
+            <li> <a href="/create-post">Create Post</a></li>
+            <li> <a href="/logout">Log Out</a></li>
+        </ul>
+    {{ else }}
+    <ul>
+        <li> <a href="/sign-up">Sign Up</a></li>
+        <li> <a href="/sign-in">Sign In</a></li>
+    </ul> 
+  </nav>
     {{ end }}
 
-    <form action="/filter" method="GET"> 
-        <input type="checkbox" name="category" value="Art" >Art</input>
-        <input type="checkbox" name="category" value="Coding" >Coding</input>
-        <input type="checkbox" name="category" value="Music" >Music</input>
-        <input type="checkbox" name="category" value="Sports" >Sport</input>
-        <input type="checkbox" name="category" value="Cooking" >Cooking</input>
-        <input type="checkbox" name="category" value="Other" >Other</input>
-        <button type="submit">Search</button>
-    </form> 
-    <div class="post">
-        {{ range .Post }}
-          <fieldset>
-            <legend>{{ .Author }}</legend>
-              <a href="/post/{{ .ID }}">{{ .Title }}</a>
-                <br>
-                    {{  .Content }}
-                <br>
-                <p>Category:{{ .Categories }}</p> 
-   
-             </fieldset>
-        {{ end }}
-              
+</div>
+    <br>
+<div><form action="/" method="GET"> 
+    <label for="category">Chose a prefrred topic:</label>
+    
+<select class="select-css" name="category">
+    <option value="all" type="submit">All</option>
+    <option value="art" type="submit">Art</option>
+    <option value="coding" type="submit">Coding</option>
+    <option value="music" type="submit">Music</option>
+    <option value="sport" type="submit">Sport</option>
+    <option value="cooking" type="submit">Cooking</option>
+    <option value="other" type="submit">Other</option>
+ 
+</select>
+<button class="button" type="submit">Apply</button>
+</form> 
+</div>
+<br>
+<div class="post">
+    {{ range .Post }}
+      <fieldset>
+        <legend class="author">{{ .Author }}</legend>
+          <a href="/comments/{{ .ID }}">{{ .Title }}</a>
             <br>
-    </div>
+                {{  .Content }}
+            <br><br>
+            <p>Category: {{ .Categories }}</p> 
+
+         </fieldset>
+         <br>
+
+    {{ end }}
+          
+        <br>
+</div>
+        
 
     </body>
 </html>
