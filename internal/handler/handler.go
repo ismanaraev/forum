@@ -22,7 +22,6 @@ const (
 	SignInAddress        = "/sign-in"
 	LogoutAddress        = "/logout"
 	CreatePostAddress    = "/create-post"
-	CommentsAddress      = "/comments/"
 	LikePostAddress      = "/like-post"
 	LikeCommentAddress   = "/like-comment"
 	CreateCommentAddress = "/create-comment"
@@ -44,7 +43,7 @@ func (h *Handler) InitRoutes() {
 	router.HandleFunc(LikePostAddress, h.IsAuthorized(h.LikePost))
 	router.HandleFunc(LikeCommentAddress, h.IsAuthorized(h.LikeComment))
 	router.HandleFunc(CreateCommentAddress, h.IsAuthorized(h.CreateComment))
-	router.HandleFunc(MyProfileAddress, h.myprofile)
+	router.HandleFunc(MyProfileAddress, h.IsAuthorized(h.myprofile))
 
 	router.Handle(TemplateAddress, http.StripPrefix("/template/", http.FileServer(http.Dir(TemplateDir))))
 	srv := new(forumv2.Server)

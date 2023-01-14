@@ -23,6 +23,7 @@ func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	token, err := r.Cookie("session_name")
+	getUUID, err := h.service.GetSessionService(token.Value)
 	if err != nil {
 		category := r.FormValue("category")
 		postData, err := h.service.GetAllPostService(category)
@@ -36,17 +37,8 @@ func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 
 		html.Execute(w, result)
 		return
-
 	} else if r.Method == http.MethodGet {
-		html, err := template.ParseFiles(TemplateDir + "html/index.html")
-		data := &models.User{}
-		// по токену запрашиваем почту пользователя
-		data.Uuid, err = h.service.GetSessionService(token.Value)
-		if err != nil {
-			http.Redirect(w, r, "/sign-up", http.StatusSeeOther)
-			return
-		}
-		userInfo, err := h.service.GetUsersInfoByUUIDService(data.Uuid)
+		userInfo, err := h.service.GetUsersInfoByUUIDService(getUUID)
 		if err != nil {
 			log.Fatalf("Get user info from handler don`t work %e", err)
 		}

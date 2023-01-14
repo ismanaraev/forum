@@ -96,8 +96,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 		categoriesArr, ok := r.PostForm["categories"]
 		if !ok {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
+			categoriesArr = []string{"other"}
 		}
 		categories := strings.Join(categoriesArr, " ")
 		post := models.Post{
