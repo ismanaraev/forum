@@ -29,12 +29,13 @@ const (
 	PostAddress          = "/post/"
 	TemplateAddress      = "/template/"
 	TemplateDir          = "../internal/template/"
+	FilterAddress        = "/filter"
 )
 
 func (h *Handler) InitRoutes() {
 	router := http.NewServeMux()
 
-	router.HandleFunc("/", h.index)
+	router.HandleFunc("/", h.IfAuthorized(h.index))
 	router.HandleFunc(SignInAddress, h.userSignIn)
 	router.HandleFunc(SignUpAddress, h.userSignUp)
 	router.HandleFunc(LogoutAddress, h.IsAuthorized(h.logOutHandler))
@@ -44,6 +45,7 @@ func (h *Handler) InitRoutes() {
 	router.HandleFunc(LikeCommentAddress, h.IsAuthorized(h.LikeComment))
 	router.HandleFunc(CreateCommentAddress, h.IsAuthorized(h.CreateComment))
 	router.HandleFunc(MyProfileAddress, h.IsAuthorized(h.myprofile))
+	router.HandleFunc(FilterAddress, h.IfAuthorized(h.FilterByCategory))
 
 	router.Handle(TemplateAddress, http.StripPrefix("/template/", http.FileServer(http.Dir(TemplateDir))))
 	srv := new(forumv2.Server)

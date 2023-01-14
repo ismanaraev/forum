@@ -28,11 +28,11 @@ type Post interface {
 	GetAllPost() ([]models.Post, error)
 	GetPostByID(id int64) (models.Post, error)
 	GetUsersPost(uuid uuid.UUID) ([]models.Post, error)
-	GetPostWithCategory(category string) ([]models.Post, error)
 	GetPostIdWithUUID(uuid uuid.UUID) ([]int64, error)
 	CreatePost(post models.Post) (int64, error)
 	GetUsersLikePosts(i []int64) ([]models.Post, error)
 	UpdatePost(models.Post) error
+	GetPostsByCategory(category models.Category) ([]models.Post, error)
 }
 
 type Session interface {

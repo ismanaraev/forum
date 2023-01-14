@@ -23,7 +23,7 @@ const (
 		content TEXT NOT NULL,
 		author VARCHAR(50) NOT NULL, 
 		createdat VARCHAR(50) NOT NULL,
-		categories ,
+		categories BIGINT UNSIGNED,
 		like INTEGER DEFAULT 0,
 		dislike INTEGER DEFAULT 0,
 		FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE,

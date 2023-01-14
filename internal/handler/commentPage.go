@@ -14,14 +14,27 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	uuid := r.Context().Value("uuid").(uuid.UUID)
+	uuidCtx := r.Context().Value("uuid")
+	if uuidCtx == nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	uuid := uuidCtx.(uuid.UUID)
 	user, err := h.service.GetUsersInfoByUUIDService(uuid)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 	postIDStr := r.FormValue("postID")
+	if postIDStr == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
 	content := r.FormValue("content")
+	if content == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
 	postID, err := strconv.Atoi(postIDStr)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

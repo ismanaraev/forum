@@ -18,7 +18,7 @@
 
     <form class="formCreatePost" action="/create-post" method="GET">
         <div>
-            <button class="btnCP" type="submit">Создать пост</button>
+            <button class="btnCP" >Создать пост</button>
         </div>
     </form>
     
@@ -26,7 +26,7 @@
 
     <form class="formLogout" action="/logout" method="GET">
         <div>
-            <button class="btnL" type="submit">Выйти</button>
+            <button class="btnL" >Выйти</button>
         </div>
     </form> 
    
@@ -34,30 +34,27 @@
  
     <form class="formSign-up" action="/sign-up" method="GET">
         <div>
-            <button class="btnSup" type="submit">Регистрация</button>
+            <button class="btnSup" >Регистрация</button>
         </div>
     </form>
     
     <form class="formSing-in" action="/sign-in" method="GET">
         <div>
-            <button class="btnSin" type="submit">Авторизация</button>
+            <button class="btnSin" >Авторизация</button>
         </div>
     </form>
     
 
     {{ end }}
 
-    <form action="/" method="GET"> 
-    <select class="select-css" name="category">
-        <option value="all" type="submit">All</option>
-        <option value="art" type="submit">Art</option>
-        <option value="coding" type="submit">Coding</option>
-        <option value="music" type="submit">Music</option>
-        <option value="sport" type="submit">Sport</option>
-        <option value="cooking" type="submit">Cooking</option>
-        <option value="other" type="submit">Other</option>
-    </select>
-    <button name="run" type="submit">Run</button>
+    <form action="/filter" method="GET"> 
+        <input type="checkbox" name="category" value="Art" >Art</input>
+        <input type="checkbox" name="category" value="Coding" >Coding</input>
+        <input type="checkbox" name="category" value="Music" >Music</input>
+        <input type="checkbox" name="category" value="Sports" >Sport</input>
+        <input type="checkbox" name="category" value="Cooking" >Cooking</input>
+        <input type="checkbox" name="category" value="Other" >Other</input>
+        <button type="submit">Search</button>
     </form> 
     <div class="post">
         {{ range .Post }}

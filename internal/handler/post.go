@@ -17,7 +17,7 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	postid := strings.TrimLeft(r.URL.Path, PostAddress)
+	postid := strings.TrimPrefix(r.URL.Path, PostAddress)
 	postID, err := strconv.ParseInt(postid, 10, 64)
 	if err != nil {
 		log.Print(err)
@@ -98,7 +98,12 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 			categoriesArr = []string{"other"}
 		}
-		categories := strings.Join(categoriesArr, " ")
+		categories, err := h.service.CreateCategory(categoriesArr)
+		if err != nil {
+			log.Print(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
 		post := models.Post{
 			Uuid:       uuid,
 			Title:      title,

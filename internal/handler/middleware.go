@@ -16,7 +16,26 @@ func (h *Handler) IsAuthorized(next http.HandlerFunc) http.HandlerFunc {
 		// по токену запрашиваем uuid пользователя
 		uuid, err := h.service.GetSessionService(token.Value)
 		if err != nil {
-			log.Fatalf("Get session from handler don`t work %e", err)
+			log.Print("Get session from handler don`t work %e", err)
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		ctx := context.WithValue(r.Context(), "uuid", uuid)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	}
+}
+
+func (h *Handler) IfAuthorized(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token, err := r.Cookie("session_name")
+		if err != nil {
+			next.ServeHTTP(w, r)
+			return
+		}
+		uuid, err := h.service.GetSessionService(token.Value)
+		if err != nil {
+			next.ServeHTTP(w, r)
+			return
 		}
 		ctx := context.WithValue(r.Context(), "uuid", uuid)
 		next.ServeHTTP(w, r.WithContext(ctx))

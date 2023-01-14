@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"forumv2/internal/models"
-	"strings"
 
 	"github.com/gofrs/uuid"
 )
@@ -132,27 +131,6 @@ func (p *PostStorage) GetUsersLikePosts(postIdArray []int64) ([]models.Post, err
 	return result, nil
 }
 
-func (p *PostStorage) GetPostWithCategory(category string) ([]models.Post, error) {
-	row, err := p.db.Query("SELECT id,uuid,title,content,author,createdAt,categories FROM post")
-	if err != nil {
-		return nil, fmt.Errorf("SELECT post with category in repository: %w", err)
-	}
-
-	temp := models.Post{}
-	postWithCategory := []models.Post{}
-
-	for row.Next() {
-		err := row.Scan(&temp.ID, &temp.Uuid, &temp.Title, &temp.Content, &temp.Author, &temp.CreatedAt, &temp.Categories)
-		if err != nil {
-			return nil, err
-		}
-		if strings.Contains(temp.Categories, category) {
-			postWithCategory = append(postWithCategory, temp)
-		}
-	}
-	return postWithCategory, nil
-}
-
 func (p *PostStorage) UpdatePost(post models.Post) error {
 	stmt := `UPDATE post SET id=$1,uuid=$2,title=$3,content=$4,author=$5,createdat=$6,categories=$7,like=$8,dislike=$9 WHERE id == $1`
 	query, err := p.db.Prepare(stmt)
@@ -164,4 +142,25 @@ func (p *PostStorage) UpdatePost(post models.Post) error {
 		return err
 	}
 	return nil
+}
+
+func (c *PostStorage) GetPostsByCategory(category models.Category) ([]models.Post, error) {
+	stmt := `SELECT id, uuid, title, content, author, createdat, categories, like, dislike FROM post WHERE categories&$1 != 0`
+	query, err := c.db.Prepare(stmt)
+	if err != nil {
+		return nil, err
+	}
+	var res []models.Post
+	values, err := query.Query(category)
+	if err != nil {
+		return nil, err
+	}
+	for values.Next() {
+		var post models.Post
+		if err := values.Scan(&post.ID, &post.Uuid, &post.Title, &post.Content, &post.Author, &post.CreatedAt, &post.Categories, &post.Like, &post.Dislike); err != nil {
+			return nil, err
+		}
+		res = append(res, post)
+	}
+	return res, nil
 }

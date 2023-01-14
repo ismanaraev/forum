@@ -25,10 +25,12 @@ type User interface {
 
 type Post interface {
 	CreatePostService(post models.Post) (int64, error)
-	GetAllPostService(category string) ([]models.Post, error)
+	GetAllPostService() ([]models.Post, error)
 	GetUsersPostInService(uuid uuid.UUID) ([]models.Post, error)
 	GetUserLikePostsInService(uuid uuid.UUID) ([]models.Post, error)
 	GetPostByIDinService(id int64) (models.Post, error)
+	FilterPostsByCategories([]string) ([]models.Post, error)
+	CreateCategory([]string) (models.Category, error)
 }
 
 type Session interface {
