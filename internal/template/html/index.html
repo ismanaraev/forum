@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +17,7 @@
         
         {{ if .Data.Username  }}
         <ul>
-            <li class="username"> {{.Data.Username  }}</li> 
+            <li> <a href="/myprofile">{{.Data.Username  }}</a></li> 
             <li> <a href="/create-post">Create Post</a></li>
             <li> <a href="/logout">Log Out</a></li>
         </ul>
@@ -29,36 +28,30 @@
     </ul> 
   </nav>
     {{ end }}
-
-</div>
-    <br>
-<div><form action="/" method="GET"> 
-    <label for="category">Chose a prefrred topic:</label>
-    
-<select class="select-css" name="category">
-    <option value="all" type="submit">All</option>
-    <option value="art" type="submit">Art</option>
-    <option value="coding" type="submit">Coding</option>
-    <option value="music" type="submit">Music</option>
-    <option value="sport" type="submit">Sport</option>
-    <option value="cooking" type="submit">Cooking</option>
-    <option value="other" type="submit">Other</option>
- 
-</select>
-<button class="button" type="submit">Apply</button>
-</form> 
+<div class="myfilter">
+    <h4>Select categories:</h4>
+    <form action="/filter" method="GET"> 
+        <input type="checkbox" name="category" value="Art" >Art</input>
+        <input type="checkbox" name="category" value="Coding" >Coding</input>
+        <input type="checkbox" name="category" value="Music" >Music</input>
+        <input type="checkbox" name="category" value="Sports" >Sport</input>
+        <input type="checkbox" name="category" value="Cooking" >Cooking</input>
+        <input type="checkbox" name="category" value="Other" >Other</input>
+        <button  class="button"type="submit">Search</button>
+    </form> 
 </div>
 <br>
 <div class="post">
     {{ range .Post }}
       <fieldset>
         <legend class="author">{{ .Author }}</legend>
-          <a href="/comments/{{ .ID }}">{{ .Title }}</a>
-            <br>
+          <a href="/post/{{ .ID }}">{{ .Title }}</a>
+          <div class="content">
+         
                 {{  .Content }}
             <br><br>
-            <p>Category: {{ .Categories }}</p> 
-
+            <p class="category">Category: {{ .Categories }}</p> 
+            </div>
          </fieldset>
          <br>
 

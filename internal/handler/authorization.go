@@ -117,12 +117,12 @@ func (h *Handler) logOutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uuidString := r.Context().Value("uuid")
-	value := uuidString.(string)
-	uuid, err := uuid.FromString(value)
-	if err != nil {
+	uuidCtx := r.Context().Value("uuid")
+	if uuidCtx == nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+	uuid := uuidCtx.(uuid.UUID)
 
 	cookie := http.Cookie{
 		Name:   "session_name",

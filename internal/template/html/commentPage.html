@@ -4,54 +4,68 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="/template/css/commentPage.css">
     <title>Comments</title>
 </head>
 <body>
-        <fieldset>
+    <nav>   
+        <label class="logo">The Forum</label>
+        <ul>
+            <li><a href="/">Homepage</a></li>
+            <li> <a href="/create-post">Create Post</a></li>
+            <li> <a href="/logout">Log Out</a></li>
+        </ul>
+  </nav>
+        <fieldset class="field">
             <legend>{{ .Post.Author }}</legend>
              <h3>{{ .Post.Title }}</h3>
-                <br>
                     {{  .Post.Content }}
-                <br>
+                <br><br>
                 <p>Category:{{ .Post.Categories }}</p> 
-
+                <div class="reactions">
                 <form action="/like-post" method="POST">
                     <input type="hidden" name="postID" value="{{.Post.ID}}">
                     <button class="btn-like" name="status" type="submit" value="1">Like</button>
-                    <p>{{.Post.Like}}</p>
+                    <p class="like-count">{{.Post.Like}}</p>
                     <button class="btn-dislike" name="status" type="submit" value="-1">Dislike</button>
-                    <p>{{.Post.Dislike}}</p>
+                    <p class="dislike-count">{{.Post.Dislike}}</p>
                 </form>
+                </div>
 
                 
-                <p>Comments:</p>
+                <p class="comments-h">Comments:</p>
 
                  {{ range .Comment }}
+                 <div class="comment-field">
                     <fieldset>       
                         <legend>{{ .Author }}</legend> 
-                                 {{ .Content }}
+                        <div class="comment-content"> {{ .Content }}</div>
+                                
                     </fieldset>
+                </div>
 		    <form action="/like-comment" method="POST"> 
 			    <button class="btn-like" name="status" type="submit" value="1">Like</button>
-                <p>{{.Like}}</p>
+                <p  class="like-count">{{.Like}}</p>
 			    <button class="btn-dislike" name="status" type="submit" value="-1">Dislike</button>
-                <p>{{.Dislike}}</p>
+                <p class="dislike-count">{{.Dislike}}</p>
 			    <input type="hidden" name="commentID" value={{.ID}}>
                 <input type="hidden" name="postID" value="{{.PostID}}">
 		    </form>
                 {{ end }}
         </fieldset>
-             <br>
-
+            <div class="create-comment">
              <form action="/create-comment" method="POST">
              <input type="hidden" value="{{.Post.ID}}" name="postID">
              <textarea class="comments-class" type="txt" name="content"></textarea>
              <br>
-             <button class="btn-comments" type="submit">Отправить</button>
+             <button class="btn-comments" type="submit">Upload</button>
              <br>
              </form>
              <p>Author</p>
+             </div>
 
 </body>
 </html>
