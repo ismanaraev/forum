@@ -31,6 +31,7 @@ type Post interface {
 	GetPostByIDinService(id int64) (models.Post, error)
 	FilterPostsByCategories([]string) ([]models.Post, error)
 	CreateCategory([]string) (models.Category, error)
+	CheckPostInput(models.Post) error
 }
 
 type Session interface {
@@ -42,6 +43,7 @@ type Comments interface {
 	GetAllCommentsInService() ([]models.Comment, error)
 	GetCommentsByIDinService(postID int64) ([]models.Comment, error)
 	CreateCommentsInService(com models.Comment) error
+	CheckCommentInput(models.Comment) error
 }
 
 type Reactions interface {

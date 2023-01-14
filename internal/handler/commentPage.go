@@ -37,7 +37,7 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 	}
 	postID, err := strconv.Atoi(postIDStr)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 	comm := models.Comment{
@@ -47,6 +47,11 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		Like:      0,
 		Dislike:   0,
 		CreatedAt: time.Now().String(),
+	}
+	err = h.service.CheckCommentInput(comm)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
 	}
 	err = h.service.CreateCommentsInService(comm)
 	if err != nil {

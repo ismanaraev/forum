@@ -101,7 +101,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		categories, err := h.service.CreateCategory(categoriesArr)
 		if err != nil {
 			log.Print(err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		post := models.Post{
@@ -113,6 +113,11 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			Categories: categories,
 			Like:       0,
 			Dislike:    0,
+		}
+		err = h.service.CheckPostInput(post)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
 		}
 		id, err := h.service.CreatePostService(post)
 		if err != nil {

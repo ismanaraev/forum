@@ -18,6 +18,22 @@ func NewPostService(repo repository.Post) *PostService {
 	}
 }
 
+func (p *PostService) CheckPostInput(post models.Post) error {
+	if len(post.Title) == 0 {
+		return errors.New("empty title")
+	}
+	if len(post.Title) > 50 {
+		return errors.New("title too long")
+	}
+	if len(post.Content) == 0 {
+		return errors.New("empty content")
+	}
+	if len(post.Content) > 1000 {
+		return errors.New("content too long")
+	}
+	return nil
+}
+
 func (p *PostService) CreatePostService(post models.Post) (int64, error) {
 	return p.repo.CreatePost(post)
 }

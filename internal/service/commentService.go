@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"forumv2/internal/models"
 	"forumv2/internal/repository"
 )
@@ -13,6 +14,16 @@ func NewCommentsService(repo repository.Comments) *CommentService {
 	return &CommentService{
 		repo: repo,
 	}
+}
+
+func (c *CommentService) CheckCommentInput(comment models.Comment) error {
+	if len(comment.Content) == 0 {
+		return errors.New("empty comment")
+	}
+	if len(comment.Content) > 500 {
+		return errors.New("comment too long")
+	}
+	return nil
 }
 
 func (c *CommentService) GetAllCommentsInService() ([]models.Comment, error) {

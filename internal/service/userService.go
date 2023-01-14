@@ -97,7 +97,7 @@ func (u *UserService) CreateSessionService(user models.User) (string, error) {
 func CreateToken() string {
 	b := make([]byte, TOKEN_SECRET)
 	if _, err := rand.Read(b); err != nil {
-		log.Fatalf("Token for user not created")
+		log.Print("Token for user not created")
 	}
 	return hex.EncodeToString(b)
 }
