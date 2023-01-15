@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"forumv2/internal/models"
 )
@@ -112,127 +111,6 @@ func (r *ReactionsStorage) GetLikeStatusByCommentAndUserID(like models.LikeComme
 		return models.NoLike, fmt.Errorf("[ReactionStorage]:Error with GetLikeStatusByCommentAndUserID method in repository: %v", err)
 	}
 	return status, nil
-}
-
-func (r *ReactionsStorage) IncrementPostLikeByPostID(postID int) error {
-	stmt := `UPDATE post SET like = like + 1 WHERE id == $1;`
-	query, err := r.db.Prepare(stmt)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with IncrementPostLikeByPostID method in repository: %v", err)
-	}
-	_, err = query.Exec(postID)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with IncrementPostLikeByPostID method in repository: %v", err)
-	}
-	return nil
-}
-
-func (r *ReactionsStorage) DecrementPostLikeByPostID(postID int) error {
-	stmt := `UPDATE post SET like = like - 1 WHERE id == $1;`
-	query, err := r.db.Prepare(stmt)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with DecrementPostLikeByPostID method in repository: %v", err)
-	}
-	_, err = query.Exec(postID)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with DecrementPostLikeByPostID method in repository: %v", err)
-	}
-	return nil
-}
-
-func (r *ReactionsStorage) IncrementPostDislikeByPostID(postID int) error {
-	stmt := `UPDATE post SET dislike = dislike + 1 WHERE id == $1;`
-	query, err := r.db.Prepare(stmt)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with IncrementPostDislikeByPostID method in repository: %v", err)
-	}
-	_, err = query.Exec(postID)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with IncrementPostDislikeByPostID method in repository: %v", err)
-	}
-	return nil
-}
-
-func (r *ReactionsStorage) DecrementPostDislikeByPostID(postID int) error {
-	stmt := `UPDATE post SET dislike = dislike - 1 WHERE id == $1;`
-	query, err := r.db.Prepare(stmt)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with DecrementPostDislikeByPostID method in repository: %v", err)
-	}
-	_, err = query.Exec(postID)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with DecrementPostDislikeByPostID method in repository: %v", err)
-	}
-	return nil
-}
-
-func (r *ReactionsStorage) IncrementCommentLikeByCommentsID(commentID int) error {
-	stmt := `UPDATE comments SET like = like + 1 WHERE id == $1;`
-	query, err := r.db.Prepare(stmt)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with IncrementCommentLikeByCommentsID method in repository: %v", err)
-	}
-	_, err = query.Exec(commentID)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with IncrementCommentLikeByCommentsID method in repository: %v", err)
-	}
-	return nil
-}
-
-func (r *ReactionsStorage) DecrementCommentLikeByCommentsID(commentID int) error {
-	stmt := `UPDATE comments SET like = like - 1 WHERE id == $1;`
-	query, err := r.db.Prepare(stmt)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with DecrementCommentLikeByCommentsID method in repository: %v", err)
-	}
-	_, err = query.Exec(commentID)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with DecrementCommentLikeByCommentsID method in repository: %v", err)
-	}
-	return nil
-}
-
-func (r *ReactionsStorage) DecrementCommentDislikeByCommentsID(commentID int) error {
-	stmt := `UPDATE comments SET dislike = dislike - 1 WHERE id == $1;`
-	query, err := r.db.Prepare(stmt)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with DecrementCommentDislikeByCommentsID method in repository: %v", err)
-	}
-	_, err = query.Exec(commentID)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with DecrementCommentDislikeByCommentsID method in repository: %v", err)
-	}
-	return nil
-}
-
-func (r *ReactionsStorage) IncrementCommentDislikeByCommentsID(commentID int) error {
-	stmt := `UPDATE comments SET dislike = dislike + 1 WHERE id == $1;`
-	query, err := r.db.Prepare(stmt)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with IncrementCommentDislikeByCommentsID method in repository: %v", err)
-	}
-	_, err = query.Exec(commentID)
-	if err != nil {
-		return fmt.Errorf("[ReactionStorage]:Error with IncrementCommentDislikeByCommentsID method in repository: %v", err)
-	}
-	return nil
-}
-
-func (r *ReactionsStorage) CheckIfLikePostExistByPostAndUserID(like models.LikePost) (bool, error) {
-	stmt := `SELECT id FROM likePost WHERE postID == $1 AND userID == $2;`
-	query, err := r.db.Prepare(stmt)
-	if err != nil {
-		return false, err
-	}
-	row := query.QueryRow(like.PostID, like.UserID)
-	var id int
-	if err := row.Scan(&id); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil
-		}
-		return false, err
-	}
-	return true, nil
 }
 
 func (r *ReactionsStorage) DeleteCommentLike(like models.LikeComment) error {

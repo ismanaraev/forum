@@ -2,11 +2,11 @@ package handler
 
 import (
 	"forumv2/internal/models"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/gofrs/uuid"

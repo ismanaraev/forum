@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"forumv2/internal/models"
 	"log"
@@ -94,4 +95,41 @@ func (u *UserStorage) GetUsersInfoByUUID(id uuid.UUID) (models.User, error) {
 		return models.User{}, err
 	}
 	return temp, nil
+}
+
+// CheckUserEmail - returns true if user by this email exists
+func (u *UserStorage) CheckUserEmail(email string) (UserExist bool, err error) {
+	stmt := `SELECT email FROM users WHERE email == $1`
+	query, err := u.db.Prepare(stmt)
+	if err != nil {
+		return false, err
+	}
+	row := query.QueryRow(email)
+	var mail string
+	err = row.Scan(&mail)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
+func (u *UserStorage) CheckUserUsername(username string) (UserExist bool, err error) {
+	stmt := `SELECT username FROM users WHERE username == $1`
+	query, err := u.db.Prepare(stmt)
+	if err != nil {
+		return false, err
+	}
+	row := query.QueryRow(username)
+	var name string
+	err = row.Scan(&name)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }

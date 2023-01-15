@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"html/template"
 	"log"
 	"net/http"
-	"text/template"
 
 	"github.com/gofrs/uuid"
 )

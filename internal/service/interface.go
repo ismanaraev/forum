@@ -21,6 +21,8 @@ type User interface {
 	AuthorizationUserService(models.User) (string, error)
 	GetUserInfoService(user models.User) (models.User, error)
 	GetUsersInfoByUUIDService(id uuid.UUID) (models.User, error)
+	CheckUserEmail(email string) (bool, error)
+	CheckUserUsername(username string) (bool, error)
 }
 
 type Post interface {

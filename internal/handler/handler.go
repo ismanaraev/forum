@@ -5,6 +5,7 @@ import (
 	"forumv2/internal/service"
 	"log"
 	"net/http"
+	"os"
 )
 
 type Handler struct {
@@ -50,8 +51,16 @@ func (h *Handler) InitRoutes() {
 	router.HandleFunc(SignatureCheck, h.needToSign)
 
 	router.Handle(TemplateAddress, http.StripPrefix("/template/", http.FileServer(http.Dir(TemplateDir))))
+	serverPort := os.Getenv("SERVER_PORT")
+	if serverPort == "" {
+		serverPort = "8081"
+	}
+	serverHost := os.Getenv("SERVER_ADDR")
+	if serverHost == "" {
+		serverHost = "127.0.0.1"
+	}
 	srv := new(forumv2.Server)
-	if err := srv.Run("8081", router); err != nil {
+	if err := srv.Run(serverHost, serverPort, router); err != nil {
 		log.Fatalf("error occured while running http server: %s", err.Error())
 	}
 }

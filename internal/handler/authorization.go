@@ -2,9 +2,9 @@ package handler
 
 import (
 	"forumv2/internal/models"
+	"html/template"
 	"log"
 	"net/http"
-	"text/template"
 
 	"github.com/gofrs/uuid"
 )
@@ -110,6 +110,26 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 			Username: username[0],
 			Password: password[0],
 			Email:    email[0],
+		}
+		EmailExist, err := h.service.CheckUserEmail(email[0])
+		if err != nil {
+			log.Printf("error in CheckUserEmail: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if EmailExist {
+			http.Error(w, "email already exists", http.StatusBadRequest)
+			return
+		}
+		UsernameExist, err := h.service.CheckUserUsername(username[0])
+		if err != nil {
+			log.Printf("error in CheckUserUsername: %v", err)
+			http.Error(w, "username already exists", http.StatusInternalServerError)
+			return
+		}
+		if UsernameExist {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
 		}
 		status, err := h.service.User.CreateUserService(data)
 		if err != nil {

@@ -8,6 +8,15 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+var CategoriesMap = map[int64]string{
+	models.Coding:  "Coding",
+	models.Art:     "Art",
+	models.Sports:  "Sports",
+	models.Cooking: "Cooking",
+	models.Music:   "Music",
+	models.Other:   "Other",
+}
+
 type PostService struct {
 	repo repository.Post
 }
@@ -39,15 +48,66 @@ func (p *PostService) CreatePostService(post models.Post) (int64, error) {
 }
 
 func (p *PostService) GetAllPostService() ([]models.Post, error) {
-	return p.repo.GetAllPost()
+	posts, err := p.repo.GetAllPost()
+	if err != nil {
+		return nil, err
+	}
+	for i := range posts {
+		posts[i].CategoriesArray = p.AssignPostCategories(posts[i].Categories)
+	}
+	return posts, nil
 }
 
 func (p *PostService) GetPostByIDinService(id int64) (models.Post, error) {
-	return p.repo.GetPostByID(id)
+	post, err := p.repo.GetPostByID(id)
+	if err != nil {
+		return models.Post{}, err
+	}
+	post.CategoriesArray = p.AssignPostCategories(post.Categories)
+	return post, nil
+}
+
+func (p *PostService) AssignPostCategories(category models.Category) []string {
+	var res []string
+	for category != 0 {
+		switch {
+		case category&models.Art != 0:
+			category -= models.Art
+			res = append(res, "Art")
+
+		case category&models.Music != 0:
+			category -= models.Music
+			res = append(res, "Music")
+
+		case category&models.Sports != 0:
+			category -= models.Sports
+			res = append(res, "Sports")
+
+		case category&models.Coding != 0:
+			category -= models.Coding
+			res = append(res, "Coding")
+
+		case category&models.Cooking != 0:
+			category -= models.Cooking
+			res = append(res, "Cooking")
+
+		case category&models.Other != 0:
+			category -= models.Other
+			res = append(res, "Other")
+		}
+	}
+	return res
 }
 
 func (p *PostService) GetUsersPostInService(uuid uuid.UUID) ([]models.Post, error) {
-	return p.repo.GetUsersPost(uuid)
+	posts, err := p.repo.GetUsersPost(uuid)
+	if err != nil {
+		return nil, err
+	}
+	for i := range posts {
+		posts[i].CategoriesArray = p.AssignPostCategories(posts[i].Categories)
+	}
+	return posts, nil
 }
 
 func (p *PostService) GetUserLikePostsInService(uuid uuid.UUID) ([]models.Post, error) {
@@ -55,7 +115,14 @@ func (p *PostService) GetUserLikePostsInService(uuid uuid.UUID) ([]models.Post, 
 	if err != nil {
 		return nil, err
 	}
-	return p.repo.GetUsersLikePosts(temp)
+	posts, err := p.repo.GetUsersLikePosts(temp)
+	if err != nil {
+		return nil, err
+	}
+	for i := range posts {
+		posts[i].CategoriesArray = p.AssignPostCategories(posts[i].Categories)
+	}
+	return posts, nil
 }
 
 func (p *PostService) FilterPostsByCategories(categories []string) ([]models.Post, error) {
@@ -63,7 +130,14 @@ func (p *PostService) FilterPostsByCategories(categories []string) ([]models.Pos
 	if err != nil {
 		return nil, err
 	}
-	return p.repo.GetPostsByCategory(category)
+	posts, err := p.repo.GetPostsByCategory(category)
+	if err != nil {
+		return nil, err
+	}
+	for i := range posts {
+		posts[i].CategoriesArray = p.AssignPostCategories(posts[i].Categories)
+	}
+	return posts, nil
 }
 
 func (p *PostService) CreateCategory(categories []string) (models.Category, error) {

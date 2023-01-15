@@ -2,8 +2,8 @@ package handler
 
 import (
 	"forumv2/internal/models"
+	"html/template"
 	"net/http"
-	"text/template"
 
 	"github.com/gofrs/uuid"
 )

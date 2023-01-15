@@ -2,8 +2,9 @@ package handler
 
 import (
 	"forumv2/internal/models"
+	"html/template"
+	"log"
 	"net/http"
-	"text/template"
 
 	"github.com/gofrs/uuid"
 )
@@ -48,7 +49,10 @@ func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 			Post: res,
 		}
 
-		html.Execute(w, result)
+		err = html.Execute(w, result)
+		if err != nil {
+			log.Print(err)
+		}
 		return
 	}
 	uuid := uuidCtx.(uuid.UUID)
@@ -73,5 +77,8 @@ func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 		Data: userInfo,
 		Post: postData,
 	}
-	html.Execute(w, result)
+	err = html.Execute(w, result)
+	if err != nil {
+		log.Print(err)
+	}
 }

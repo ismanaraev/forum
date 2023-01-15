@@ -101,3 +101,11 @@ func CreateToken() string {
 	}
 	return hex.EncodeToString(b)
 }
+
+func (u *UserService) CheckUserEmail(email string) (bool, error) {
+	return u.repo.CheckUserEmail(email)
+}
+
+func (u *UserService) CheckUserUsername(username string) (bool, error) {
+	return u.repo.CheckUserUsername(username)
+}
