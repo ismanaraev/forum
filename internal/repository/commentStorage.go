@@ -31,7 +31,13 @@ func (c *CommentStorage) CreateComments(com models.Comment) error {
 }
 
 func (c *CommentStorage) GetAllComments() ([]models.Comment, error) {
-	row, err := c.db.Query("SELECT id, postID,content,author,like,dislike,createdat FROM comments")
+	stmt := `SELECT id, postID,content,author,like,dislike,createdat FROM comments`
+	query, err := c.db.Prepare(stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	row, err := query.Query()
 	if err != nil {
 		return nil, fmt.Errorf("[CommentStorage]:Error with GetAllComments method in repository: %w", err)
 	}

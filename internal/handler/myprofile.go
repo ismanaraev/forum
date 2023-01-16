@@ -3,6 +3,7 @@ package handler
 import (
 	"forumv2/internal/models"
 	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/gofrs/uuid"
@@ -29,8 +30,8 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uuidString := r.Context().Value("uuid")
-	uuid := uuidString.(uuid.UUID)
+	uuidCtx := r.Context().Value("uuid")
+	uuid := uuidCtx.(uuid.UUID)
 
 	switch r.Method {
 	case http.MethodGet:
@@ -50,6 +51,10 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 		}
 
 		userLikePosts, err := h.service.GetUserLikePostsInService(uuid)
+		if err != nil {
+			log.Print(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
 
 		data := &Data{
 			Userinfo: userInfo,
@@ -57,7 +62,11 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 			LikePost: userLikePosts,
 		}
 
-		html.Execute(w, data)
+		err = html.Execute(w, data)
+		if err != nil {
+			log.Print(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
 
 	default:
 		errorHeader(w, "", http.StatusMethodNotAllowed)

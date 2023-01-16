@@ -113,7 +113,7 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 		}
 		EmailExist, err := h.service.CheckUserEmail(email[0])
 		if err != nil {
-			log.Printf("error in CheckUserEmail: %v", err)
+			log.Print(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -123,12 +123,12 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 		}
 		UsernameExist, err := h.service.CheckUserUsername(username[0])
 		if err != nil {
-			log.Printf("error in CheckUserUsername: %v", err)
-			http.Error(w, "username already exists", http.StatusInternalServerError)
+			log.Print(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 		if UsernameExist {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, "username already exists", http.StatusBadRequest)
 			return
 		}
 		status, err := h.service.User.CreateUserService(data)

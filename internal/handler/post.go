@@ -47,10 +47,32 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+	uuidCtx := r.Context().Value("uuid")
+	if uuidCtx == nil {
+		res := struct {
+			User    *models.User
+			Post    models.Post
+			Comment []models.Comment
+		}{User: nil, Post: post, Comment: comments}
+		err = tmpl.Execute(w, &res)
+		if err != nil {
+			log.Print(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		return
+	}
+	uuid := uuidCtx.(uuid.UUID)
+	user, err := h.service.GetUsersInfoByUUIDService(uuid)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 	res := struct {
+		User    *models.User
 		Post    models.Post
 		Comment []models.Comment
-	}{Post: post, Comment: comments}
+	}{User: &user, Post: post, Comment: comments}
 	err = tmpl.Execute(w, &res)
 	if err != nil {
 		log.Print(err)
@@ -69,7 +91,10 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		tmpl.Execute(w, nil)
+		err = tmpl.Execute(w, nil)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
 
 	case http.MethodPost:
 		uuidCtx := r.Context().Value("uuid")
@@ -106,7 +131,11 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		categoriesArr := r.PostForm["categories"]
+		categoriesArr, ok := r.PostForm["categories"]
+		if !ok {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
 		categories, err := h.service.CreateCategory(categoriesArr)
 		if err != nil {
 			log.Print(err)
