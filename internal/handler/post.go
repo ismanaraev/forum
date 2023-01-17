@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"database/sql"
+	"errors"
 	"forumv2/internal/models"
 	"html/template"
 	"log"
@@ -14,37 +16,36 @@ import (
 
 func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		errorHeader(w, "", http.StatusMethodNotAllowed)
-		//http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		errorHeader(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 	postid := strings.TrimPrefix(r.URL.Path, PostAddress)
 	postID, err := strconv.ParseInt(postid, 10, 64)
 	if err != nil {
 		log.Print(err)
-		errorHeader(w, "", http.StatusInternalServerError)
-		//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorHeader(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 	post, err := h.service.GetPostByIDinService(postID)
 	if err != nil {
 		log.Print(err)
-		errorHeader(w, "", http.StatusInternalServerError)
-		//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		if errors.Is(err, sql.ErrNoRows) {
+			errorHeader(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 	comments, err := h.service.GetCommentsByIDinService(post.ID)
 	if err != nil {
 		log.Print(err)
-		errorHeader(w, "", http.StatusInternalServerError)
-		//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 	tmpl, err := template.ParseFiles(TemplateDir + "html/commentPage.html")
 	if err != nil {
 		log.Print(err)
-		errorHeader(w, "", http.StatusInternalServerError)
-		//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 	uuidCtx := r.Context().Value("uuid")
@@ -57,7 +58,7 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		err = tmpl.Execute(w, &res)
 		if err != nil {
 			log.Print(err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 		return
@@ -76,8 +77,7 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, &res)
 	if err != nil {
 		log.Print(err)
-		errorHeader(w, "", http.StatusInternalServerError)
-		//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 }
@@ -87,60 +87,54 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		tmpl, err := template.ParseFiles(TemplateDir + "html/createPost.html")
 		if err != nil {
-			errorHeader(w, "", http.StatusInternalServerError)
-			//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 		err = tmpl.Execute(w, nil)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
 		}
 
 	case http.MethodPost:
 		uuidCtx := r.Context().Value("uuid")
 		if uuidCtx == nil {
-			errorHeader(w, "", http.StatusBadRequest)
-			//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		uuid := uuidCtx.(uuid.UUID)
 		user, err := h.service.GetUsersInfoByUUIDService(uuid)
 		if err != nil {
 			log.Print(err)
-			errorHeader(w, "", http.StatusInternalServerError)
-			//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 		err = r.ParseForm()
 		if err != nil {
 			log.Print(err)
-			errorHeader(w, "", http.StatusBadRequest)
-			//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		title := r.PostFormValue("title")
 		if title == "" {
-			errorHeader(w, "", http.StatusBadRequest)
-			//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		content := r.PostFormValue("content")
 		if err != nil {
 			log.Print(err)
-			errorHeader(w, "", http.StatusBadRequest)
-			//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		categoriesArr, ok := r.PostForm["categories"]
 		if !ok {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		categories, err := h.service.CreateCategory(categoriesArr)
 		if err != nil {
 			log.Print(err)
-			errorHeader(w, "", http.StatusBadRequest)
-			//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 
@@ -158,21 +152,18 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 		err = h.service.CheckPostInput(post)
 		if err != nil {
-			errorHeader(w, "Post Is Filled Out Incorrectly", http.StatusBadRequest)
-			//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		id, err := h.service.CreatePostService(post)
 		if err != nil {
 			log.Print(err)
-			errorHeader(w, "", http.StatusInternalServerError)
-			//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 		http.Redirect(w, r, PostAddress+strconv.FormatInt(id, 10), http.StatusSeeOther)
 	default:
-		errorHeader(w, "", http.StatusBadRequest)
-		//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		errorHeader(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 
 	}

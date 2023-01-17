@@ -16,7 +16,7 @@ func errorHeader(w http.ResponseWriter, errorMessage string, status int) {
 	errH := setError(status, errorMessage)
 	html, err := template.ParseFiles(TemplateDir + "html/error.html")
 	if err != nil {
-		errorHeader(w, errorMessage, http.StatusInternalServerError)
+		http.Error(w, errorMessage, http.StatusInternalServerError)
 		return
 	}
 	html.Execute(w, errH)

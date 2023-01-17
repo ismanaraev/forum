@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"log"
 	"net/http"
 )
 
@@ -15,9 +16,8 @@ func (h *Handler) IsAuthorized(next http.HandlerFunc) http.HandlerFunc {
 		// по токену запрашиваем uuid пользователя
 		uuid, err := h.service.GetSessionService(token.Value)
 		if err != nil {
-			log.Print("Get session from handler don`t work %e", err)
-			errorHeader(w, "", http.StatusInternalServerError)
-			//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			log.Printf("Get session from handler don`t work %e", err)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		ctx := context.WithValue(r.Context(), "uuid", uuid)

@@ -17,16 +17,13 @@ type Data struct {
 
 func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/myprofile" {
-		errorHeader(w, "", http.StatusNotFound)
-		//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		errorHeader(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
 	html, err := template.ParseFiles(TemplateDir + "html/myprofile.html")
 	if err != nil {
-		errorHeader(w, "", http.StatusNotFound)
-
-		//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		errorHeader(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
@@ -38,22 +35,21 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 
 		userInfo, err := h.service.GetUsersInfoByUUIDService(uuid)
 		if err != nil {
-			errorHeader(w, "", http.StatusInternalServerError)
-			//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
 		usersPost, err := h.service.GetUsersPostInService(uuid)
 		if err != nil {
-			errorHeader(w, "", http.StatusInternalServerError)
-			//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
 		userLikePosts, err := h.service.GetUserLikePostsInService(uuid)
 		if err != nil {
 			log.Print(err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
 		}
 
 		data := &Data{
@@ -65,13 +61,11 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 		err = html.Execute(w, data)
 		if err != nil {
 			log.Print(err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
 
 	default:
-		errorHeader(w, "", http.StatusMethodNotAllowed)
-
-		//http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		errorHeader(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 }

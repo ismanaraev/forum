@@ -28,7 +28,7 @@
                     {{  .Post.Content }}
                     </div>
                 <br><br>
-                <p>Category:{{ .Post.Categories }}</p> 
+                <p>Category:{{ range .Post.CategoriesArray }}{{.}} {{end}}</p> 
                 <div class="reactions">
                 <form action="/like-post" method="POST">
                     <input type="hidden" name="postID" value="{{.Post.ID}}">

@@ -16,30 +16,24 @@ type AllData struct {
 
 func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		errorHeader(w, "", http.StatusNotFound)
-		//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		errorHeader(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
 	if r.Method != http.MethodGet {
-		errorHeader(w, "", http.StatusMethodNotAllowed)
-		//http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		errorHeader(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
 	html, err := template.ParseFiles(TemplateDir + "html/index.html")
 	if err != nil {
-		errorHeader(w, "", http.StatusNotFound)
-
-		//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	res, err := h.service.GetAllPostService()
 	if err != nil {
-		errorHeader(w, "", http.StatusNotFound)
-
-		//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -59,17 +53,13 @@ func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 
 	userInfo, err := h.service.GetUsersInfoByUUIDService(uuid)
 	if err != nil {
-		errorHeader(w, "", http.StatusInternalServerError)
-
-		//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	postData, err := h.service.GetAllPostService()
 	if err != nil {
-		errorHeader(w, "", http.StatusInternalServerError)
-
-		//http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 

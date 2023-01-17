@@ -31,7 +31,7 @@
      
             {{  .Content }}
         <br><br>
-        <p class="category">Category: {{ .Categories }}</p> 
+        <p class="category">Category: {{ range .CategoriesArray }}{{.}} {{end}}</p> 
         </div>
         </div>
      </fieldset>

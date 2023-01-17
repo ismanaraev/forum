@@ -90,7 +90,7 @@
             <br>
                 {{  .Content }}
             <br>
-            <p>Category:{{ .Categories }}</p> 
+            <p>Category:{{ range .CategoriesArray }}{{.}} {{end}}</p> 
 
          </fieldset>
     {{ end }}
