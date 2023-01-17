@@ -30,6 +30,7 @@ const (
 	TemplateAddress      = "/template/"
 	TemplateDir          = "../internal/template/"
 	FilterAddress        = "/filter"
+	SignatureCheck       = "/need-to-sign"
 )
 
 func (h *Handler) InitRoutes() {
@@ -46,6 +47,8 @@ func (h *Handler) InitRoutes() {
 	router.HandleFunc(CreateCommentAddress, h.IsAuthorized(h.CreateComment))
 	router.HandleFunc(MyProfileAddress, h.IsAuthorized(h.myprofile))
 	router.HandleFunc(FilterAddress, h.IfAuthorized(h.FilterByCategory))
+	router.HandleFunc(SignatureCheck, h.needToSign)
+
 	router.Handle(TemplateAddress, http.StripPrefix("/template/", http.FileServer(http.Dir(TemplateDir))))
 	srv := new(forumv2.Server)
 	if err := srv.Run("8081", router); err != nil {

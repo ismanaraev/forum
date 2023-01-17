@@ -5,8 +5,8 @@ body{
     font-size: 15px;
 }
 .content{
-    width:300px; /* ширина блока */
-    height: 130px; /* высота блока */
+    width:500px; /* ширина блока */
+    height: 300px; /* высота блока */
     background: #242524; /* фон блока */
     border-radius: 10px; /* закругленные углы блока */
     box-shadow: 2px 5px 5px 0px #000000; /* тень блока */
@@ -20,11 +20,26 @@ body{
     right: 0;
     margin: auto;
     }
-    .content a{
+    .link-box{
+        width:30%;
+        height:20%;
+        border-color:  white;
+        border-radius: 10px;
+        text-align: center;
+        position: relative;
+
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .link-box a{
         text-decoration: none;
         color:white;
+        box-shadow: 2px 5px 5px 0px lavender; /* тень блока */
         margin-top: 50px;
+     
     }
-    .content a:hover{
+    .link-box a:hover{
         color:#717786;
     }
