@@ -3,13 +3,14 @@ package handler
 import (
 	"database/sql"
 	"errors"
-	"forumv2/internal/models"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"forumv2/internal/models"
 
 	"github.com/gofrs/uuid"
 )
@@ -51,10 +52,10 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 	uuidCtx := r.Context().Value("uuid")
 	if uuidCtx == nil {
 		res := struct {
-			User    *models.User
+			User    models.User
 			Post    models.Post
 			Comment []models.Comment
-		}{User: nil, Post: post, Comment: comments}
+		}{User: models.User{}, Post: post, Comment: comments}
 		err = tmpl.Execute(w, &res)
 		if err != nil {
 			log.Print(err)
@@ -70,15 +71,13 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	res := struct {
-		User    *models.User
+		User    models.User
 		Post    models.Post
 		Comment []models.Comment
-	}{User: &user, Post: post, Comment: comments}
+	}{User: user, Post: post, Comment: comments}
 	err = tmpl.Execute(w, &res)
 	if err != nil {
 		log.Print(err)
-		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
 	}
 }
 
@@ -126,10 +125,8 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		categoriesArr, ok := r.PostForm["categories"]
-		if !ok {
-			categoriesArr = []string{"All"}
-		}
+		categoriesArr := r.PostForm["categories"]
+		categoriesArr = append(categoriesArr, "All")
 		categories, err := h.service.CreateCategory(categoriesArr)
 		if err != nil {
 			log.Print(err)

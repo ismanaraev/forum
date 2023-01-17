@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"forumv2"
-	"forumv2/internal/service"
 	"log"
 	"net/http"
 	"os"
+
+	"forumv2"
+	"forumv2/internal/service"
 )
 
 type Handler struct {
@@ -29,7 +30,7 @@ const (
 	MyProfileAddress     = "/myprofile"
 	PostAddress          = "/post/"
 	TemplateAddress      = "/template/"
-	TemplateDir          = "../internal/template/"
+	TemplateDir          = "./internal/template/"
 	FilterAddress        = "/filter"
 	SignatureCheck       = "/need-to-sign"
 )
@@ -42,7 +43,7 @@ func (h *Handler) InitRoutes() {
 	router.HandleFunc(SignUpAddress, h.userSignUp)
 	router.HandleFunc(LogoutAddress, h.IsAuthorized(h.logOutHandler))
 	router.HandleFunc(CreatePostAddress, h.IsAuthorized(h.CreatePost))
-	router.HandleFunc(PostAddress, h.Post)
+	router.HandleFunc(PostAddress, h.IfAuthorized(h.Post))
 	router.HandleFunc(LikePostAddress, h.IsAuthorized(h.LikePost))
 	router.HandleFunc(LikeCommentAddress, h.IsAuthorized(h.LikeComment))
 	router.HandleFunc(CreateCommentAddress, h.IsAuthorized(h.CreateComment))

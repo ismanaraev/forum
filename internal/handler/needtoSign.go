@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"html/template"
 	"log"
 	"net/http"
-	"text/template"
 )
 
 func (h *Handler) needToSign(w http.ResponseWriter, r *http.Request) {

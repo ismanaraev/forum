@@ -14,9 +14,19 @@
     <nav>   
         <label class="logo">The Forum</label>
         <ul>
-            <li><a href="/">Homepage</a></li>
+        {{ if .User.Username  }}
+        <ul>
+            <li> <a href="/myprofile">{{.User.Username  }}</a></li> 
             <li> <a href="/create-post">Create Post</a></li>
             <li> <a href="/logout">Log Out</a></li>
+        </ul>
+        {{ else }}
+        <ul>
+            <li><a href="/">Homepage</a></li>
+            <li> <a href="/sign-up">Sign Up</a></li>
+            <li> <a href="/sign-in">Sign In</a></li>
+        </ul> 
+        {{ end }}
         </ul>
   </nav>
 

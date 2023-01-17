@@ -94,7 +94,7 @@ func (p *PostService) AssignPostCategories(category models.Category) []string {
 		case category&models.Other != 0:
 			category -= models.Other
 			res = append(res, "Other")
-		default:
+		case category&models.All != 0:
 			category -= models.All
 			res = append(res, "All")
 		}
@@ -132,9 +132,6 @@ func (p *PostService) FilterPostsByCategories(categories []string) ([]models.Pos
 	category, err := p.CreateCategory(categories)
 	if err != nil {
 		return nil, err
-	}
-	if category&models.All != 0 {
-		return p.repo.GetAllPost()
 	}
 	posts, err := p.repo.GetPostsByCategory(category)
 	if err != nil {

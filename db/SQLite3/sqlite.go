@@ -8,7 +8,7 @@ import (
 )
 
 func Database() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "../db/SQLite3/store.db")
+	db, err := sql.Open("sqlite3", "./db/SQLite3/store.db")
 	if err != nil {
 		return nil, fmt.Errorf("can't open database: %w", err)
 	}
