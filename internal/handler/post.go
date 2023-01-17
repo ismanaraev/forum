@@ -128,8 +128,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 		categoriesArr, ok := r.PostForm["categories"]
 		if !ok {
-			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
+			categoriesArr = []string{"All"}
 		}
 		categories, err := h.service.CreateCategory(categoriesArr)
 		if err != nil {

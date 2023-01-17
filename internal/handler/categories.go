@@ -15,7 +15,7 @@ func (h *Handler) FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	}
 	categoriesArr, ok := r.URL.Query()["category"]
 	if !ok {
-		errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		errorHeader(w, "invalid category", http.StatusBadRequest)
 		return
 	}
 	_, err := h.service.CreateCategory(categoriesArr)
