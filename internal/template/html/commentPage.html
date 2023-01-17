@@ -19,10 +19,14 @@
             <li> <a href="/logout">Log Out</a></li>
         </ul>
   </nav>
+
         <fieldset class="field">
             <legend>{{ .Post.Author }}</legend>
+            <div class="content-limit">
              <h3>{{ .Post.Title }}</h3>
+             <div class="comment-content">
                     {{  .Post.Content }}
+                    </div>
                 <br><br>
                 <p>Category:{{ .Post.Categories }}</p> 
                 <div class="reactions">
@@ -35,15 +39,16 @@
                 </form>
                 </div>
 
-                
+                </div>
                 <p class="comments-h">Comments:</p>
 
                  {{ range .Comment }}
                  <div class="comment-field">
-                    <fieldset>       
+                    <fieldset>   
+                        <div class="content-limit">
                         <legend>{{ .Author }}</legend> 
-                        <div class="comment-content"> {{ .Content }}</div>
-                                
+                        <div class="comment-content" > {{ .Content }}</div>
+                             </div>   
                     </fieldset>
                 </div>
 		    <form action="/like-comment" method="POST"> 
@@ -54,8 +59,11 @@
 			    <input type="hidden" name="commentID" value={{.ID}}>
                 <input type="hidden" name="postID" value="{{.PostID}}">
 		    </form>
+
                 {{ end }}
+         
         </fieldset>
+    
             <div class="create-comment">
              <form action="/create-comment" method="POST">
              <input type="hidden" value="{{.Post.ID}}" name="postID">
@@ -64,7 +72,6 @@
              <button class="btn-comments" type="submit">Upload</button>
              <br>
              </form>
-             <p>Author</p>
              </div>
 
 </body>

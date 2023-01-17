@@ -80,6 +80,32 @@
         transition: .5s;
         color:black;
     }
+    .btn-like{
+        margin-top: 10px;
+        cursor:pointer;
+        background-color: #1b663e;
+        font-family: 'JetBrains Mono', monospace;
+        color:black;
+        text-align: center;
+        display: inline-block;
+        box-shadow: #808482;
+        border-radius: 5px;
+        padding: 1px 15px;
+        box-shadow: 0 1px #585a59;
+    }
+    .btn-dislike{
+        margin-top: 10px;
+        cursor:pointer;
+        background-color: #f94449;
+        color:black;
+        font-family: 'JetBrains Mono', monospace;
+        text-align: center;
+        display: inline-block;
+        box-shadow: #808482;
+        border-radius: 5px;
+        padding: 1px 15px;
+        box-shadow: 0 1px #585a59;
+    }
     @media (max-width: 952px){
         label.logo{
             font-size:30px;
@@ -129,6 +155,11 @@
         nav ul li a.active{
             display:flex;
         }
+    }
+    .content-limit{
+        max-width : 100%;
+        display: inline-block;
+      word-break: break-all;
     }
     @media (max-width:260px) {
         label.logo{

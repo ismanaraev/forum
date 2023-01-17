@@ -25,6 +25,7 @@
   {{ range .Post }}
   <fieldset>
     <legend class="author">{{ .Author }}</legend>
+    <div class="content-limit">
       <a href="/post/{{ .ID }}">{{ .Title }}</a>
       <div class="content">
      
@@ -32,20 +33,31 @@
         <br><br>
         <p class="category">Category: {{ .Categories }}</p> 
         </div>
+        </div>
      </fieldset>
      <br>
 
 {{ end }}
 </div>
-<h2>My Likes:</h2>
-     {{ range .LikePost }}
-     {{ .}}
+<h2>My Likes:</h2>  
+<div class="post">
+{{ range .LikePost }}
+<fieldset> 
+  
+    <legend class="author">{{ .Author }}</legend>
+    <div class="content-limit">
+        <a href="/post/{{ .ID }}">{{ .Title }}</a>
+        <div class="content">
+     {{.Content}}
      <br>
-     <br>
-  {{ end }}
+     <button class="btn-like" >{{.Like}}</button>
+     <button class="btn-dislike" >{{.Dislike}}</button>    
+     </div> 
+ </div>
 
-<br>
-<br>
+  </fieldset> 
 
+   {{ end }}
+</div>
 </body>
 </html>

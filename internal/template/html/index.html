@@ -45,12 +45,13 @@
     {{ range .Post }}
       <fieldset>
         <legend class="author">{{ .Author }}</legend>
+        <div class="content-limit">
           <a href="/post/{{ .ID }}">{{ .Title }}</a>
           <div class="content">
-         
                 {{  .Content }}
             <br><br>
             <p class="category">Category: {{ .Categories }}</p> 
+            </div>
             </div>
          </fieldset>
          <br>

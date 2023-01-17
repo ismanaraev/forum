@@ -50,6 +50,7 @@ label.logo{
 }
 .myfilter{
     padding: 25px 50px 5px 50px;
+
 }
 .content{
     padding: 10px 25px;
@@ -208,4 +209,9 @@ font-size: 8px;
         padding: 0px;
         margin: 0px;
     }
+}
+.content-limit{
+      max-width : 100%;
+      display: inline-block;
+    word-break: break-all;
 }

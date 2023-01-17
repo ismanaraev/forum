@@ -12,14 +12,16 @@ import (
 // // авторизация
 func (h *Handler) userSignIn(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/sign-in" {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		errorHeader(w, http.StatusNotFound)
+		//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 	switch r.Method {
 	case http.MethodGet:
 		html, err := template.ParseFiles(TemplateDir + "html/signIn.html")
 		if err != nil {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			errorHeader(w, http.StatusNotFound)
+			//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
 		html.Execute(w, nil)
@@ -27,12 +29,14 @@ func (h *Handler) userSignIn(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		email, ok := r.Form["email"]
 		if !ok {
-			http.Error(w, "username field not found", http.StatusInternalServerError)
+			errorHeader(w, http.StatusInternalServerError)
+			//	http.Error(w, "username field not found", http.StatusInternalServerError)
 			return
 		}
 		password, ok := r.Form["password"]
 		if !ok {
-			http.Error(w, "email field not found", http.StatusInternalServerError)
+			errorHeader(w, http.StatusInternalServerError)
+			//http.Error(w, "email field not found", http.StatusInternalServerError)
 			return
 		}
 		data := models.User{
@@ -41,7 +45,8 @@ func (h *Handler) userSignIn(w http.ResponseWriter, r *http.Request) {
 		}
 		token, err := h.service.AuthorizationUserService(data)
 		if err != nil {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			errorHeader(w, http.StatusBadRequest)
+			//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		cookie := http.Cookie{
@@ -52,7 +57,8 @@ func (h *Handler) userSignIn(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &cookie)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	default:
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		errorHeader(w, http.StatusMethodNotAllowed)
+		//	http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 }
@@ -60,14 +66,16 @@ func (h *Handler) userSignIn(w http.ResponseWriter, r *http.Request) {
 // регистрация
 func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/sign-up" {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		errorHeader(w, http.StatusNotFound)
+		//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 	switch r.Method {
 	case http.MethodGet:
 		html, err := template.ParseFiles(TemplateDir + "html/signUp.html")
 		if err != nil {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			errorHeader(w, http.StatusNotFound)
+			//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
 		html.Execute(w, nil)
@@ -75,22 +83,26 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		username, ok := r.Form["username"]
 		if !ok {
-			http.Error(w, "username field not found", http.StatusInternalServerError)
+			errorHeader(w, http.StatusInternalServerError)
+			//http.Error(w, "username field not found", http.StatusInternalServerError)
 			return
 		}
 		name, ok := r.Form["name"]
 		if !ok {
-			http.Error(w, "name field not found", http.StatusInternalServerError)
+			errorHeader(w, http.StatusInternalServerError)
+			//http.Error(w, "name field not found", http.StatusInternalServerError)
 			return
 		}
 		password, ok := r.Form["password"]
 		if !ok {
-			http.Error(w, "username field not found", http.StatusInternalServerError)
+			errorHeader(w, http.StatusInternalServerError)
+			//http.Error(w, "username field not found", http.StatusInternalServerError)
 			return
 		}
 		email, ok := r.Form["email"]
 		if !ok {
-			http.Error(w, "email field not found", http.StatusInternalServerError)
+			errorHeader(w, http.StatusInternalServerError)
+			//http.Error(w, "email field not found", http.StatusInternalServerError)
 			return
 		}
 		data := models.User{
@@ -106,20 +118,23 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 	default:
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		errorHeader(w, http.StatusNotFound)
+		//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 }
 
 func (h *Handler) logOutHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/logout" {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		errorHeader(w, http.StatusNotFound)
+		//http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
 	uuidCtx := r.Context().Value("uuid")
 	if uuidCtx == nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		errorHeader(w, http.StatusBadRequest)
+		//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 	uuid := uuidCtx.(uuid.UUID)

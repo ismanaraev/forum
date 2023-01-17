@@ -17,7 +17,8 @@ func (h *Handler) IsAuthorized(next http.HandlerFunc) http.HandlerFunc {
 		uuid, err := h.service.GetSessionService(token.Value)
 		if err != nil {
 			log.Print("Get session from handler don`t work %e", err)
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			errorHeader(w, http.StatusInternalServerError)
+			//http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		ctx := context.WithValue(r.Context(), "uuid", uuid)
