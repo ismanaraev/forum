@@ -14,7 +14,14 @@
     <div class="content">
         <div class="error-message">
         <p>Something Went Wrong</p>
+         {{if .SpecialMessage}}
+        <p>{{.SpecialMessage}}</p>
+
+        {{ else }}        
         <p>Error {{.Status}}: {{.Message}}</p>
+
+        {{end}}
+
         <p>Go Back To <a class="link" href="/">HomePage</a></p>
         </div>
        

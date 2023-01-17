@@ -1,11 +1,10 @@
-
-    body{
-        font-family: 'JetBrains Mono', monospace;
-        background: #4c4e4d;
-        color: white;
-        font-size: 15px;
-    }
-    .content{
+body{
+    font-family: 'JetBrains Mono', monospace;
+    background: #4c4e4d;
+    color: white;
+    font-size: 15px;
+}
+.content{
     width:300px; /* ширина блока */
     height: 130px; /* высота блока */
     background: #242524; /* фон блока */
@@ -29,8 +28,3 @@
     .content a:hover{
         color:#717786;
     }
-    .error-message{
-        margin-top: 20px;    
-    }
-
-  
