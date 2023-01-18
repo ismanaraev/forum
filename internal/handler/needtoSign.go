@@ -22,6 +22,8 @@ func (h *Handler) needToSign(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(http.StatusBadRequest)
 	err = html.Execute(w, "")
 	if err != nil {
 		log.Print(err)
