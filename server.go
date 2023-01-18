@@ -1,7 +1,13 @@
 package forumv2
 
 import (
+	"context"
+	"errors"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -18,5 +24,17 @@ func (s *Server) Run(host, port string, handler http.Handler) error {
 		WriteTimeout:   10 * time.Second,
 	}
 
-	return s.httpServer.ListenAndServe()
+	signal, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	go func() {
+		if err := s.httpServer.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal(err)
+		}
+	}()
+	<-signal.Done()
+	log.Print("Shutting down server")
+	if err := s.httpServer.Shutdown(context.Background()); err != nil {
+		log.Fatal(err)
+	}
+	return nil
 }

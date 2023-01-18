@@ -13,4 +13,4 @@ COPY --from=build /build/internal/template/ /app/internal/template/
 
 ENV SERVER_ADDR="0.0.0.0"
 
-CMD mkdir -p /app/db/SQLite3 && cd /app/cmd && ./forum 
+CMD mkdir -p /app/db/SQLite3 && cd /app && ./cmd/forum 

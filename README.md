@@ -86,7 +86,11 @@ For the forum project you must use Docker. You can read about docker basics in t
 
 ## Usage:
 
-- Please make to clone this repository </br>
-- Open the folder in your IDE </br>
-- In directory **forum** write the command `go run /cmd/main.go` </br>
-- Follow this link to **_localhost:8081/_** </br>
+run:
+go run cmd/main.go
+
+docker:
+docker build -t forum .
+docker image prune -f
+docker container prune -f
+docker run -p 8081:8081 --name forum forum
