@@ -48,6 +48,7 @@ func (h *Handler) FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
 	uuid := uuidCtx.(uuid.UUID)
 	user, err := h.service.GetUsersInfoByUUIDService(uuid)
 	if err != nil {

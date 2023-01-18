@@ -4,6 +4,7 @@ import (
 	"errors"
 	"forumv2/internal/models"
 	"forumv2/internal/repository"
+	"strings"
 )
 
 type CommentService struct {
@@ -17,6 +18,9 @@ func NewCommentsService(repo repository.Comments) *CommentService {
 }
 
 func (c *CommentService) CheckCommentInput(comment models.Comment) error {
+	if comment := strings.Trim(comment.Content, "\r\n "); len(comment) == 0 {
+		return errors.New("empty title")
+	}
 	if len(comment.Content) == 0 {
 		return errors.New("empty comment")
 	}

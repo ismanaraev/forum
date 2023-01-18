@@ -4,6 +4,7 @@ import (
 	"errors"
 	"forumv2/internal/models"
 	"forumv2/internal/repository"
+	"strings"
 
 	"github.com/gofrs/uuid"
 )
@@ -21,7 +22,7 @@ type PostService struct {
 	repo repository.Post
 }
 
-func NewPostService(repo repository.Post) *PostService {
+func NewPostService(repo repository.Post) Post {
 	return &PostService{
 		repo: repo,
 	}
@@ -29,6 +30,12 @@ func NewPostService(repo repository.Post) *PostService {
 
 func (p *PostService) CheckPostInput(post models.Post) error {
 	if len(post.Title) == 0 {
+		return errors.New("empty title")
+	}
+	if title := strings.Trim(post.Title, "\r\n "); len(title) == 0 {
+		return errors.New("empty title")
+	}
+	if content := strings.Trim(post.Content, "\r\n "); len(content) == 0 {
 		return errors.New("empty title")
 	}
 	if len(post.Title) > 50 {

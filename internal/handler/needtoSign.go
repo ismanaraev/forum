@@ -23,7 +23,7 @@ func (h *Handler) needToSign(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusBadRequest)
+	// w.WriteHeader(http.StatusBadRequest)
 	err = html.Execute(w, "")
 	if err != nil {
 		log.Print(err)

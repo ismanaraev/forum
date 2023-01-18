@@ -124,7 +124,7 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 		status, err := h.service.User.CreateUserService(data)
 		if err != nil {
 			errorHeader(w, "One field is filled out incorrectly", status)
-			//http.Error(w, http.StatusText(status), status)
+			// http.Error(w, http.StatusText(status), status)
 			log.Printf("User not created")
 			return
 		}
@@ -146,7 +146,7 @@ func (h *Handler) logOutHandler(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	uuid := uuidCtx.(uuid.UUID)
+	uuidStmt := uuidCtx.(uuid.UUID)
 
 	cookie := http.Cookie{
 		Name:   "session_name",
@@ -154,7 +154,7 @@ func (h *Handler) logOutHandler(w http.ResponseWriter, r *http.Request) {
 		MaxAge: -1,
 	}
 	http.SetCookie(w, &cookie)
-	err := h.service.DeleteSessionService(uuid)
+	err := h.service.DeleteSessionService(uuidStmt)
 	if err != nil {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

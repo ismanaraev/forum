@@ -84,9 +84,9 @@ For the forum project you must use Docker. You can read about docker basics in t
     bcrypt
     UUID
 
-## Usage:
+## Usage
 
-run:
+run
 go run cmd/main.go
 
 docker:
