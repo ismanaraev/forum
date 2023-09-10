@@ -20,7 +20,7 @@ func (h *Handler) IsAuthorized(next http.HandlerFunc) http.HandlerFunc {
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "uuid", uuid)
+		ctx := context.WithValue(r.Context(), "UserID", uuid)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }
@@ -37,7 +37,7 @@ func (h *Handler) IfAuthorized(next http.HandlerFunc) http.HandlerFunc {
 			next.ServeHTTP(w, r)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "uuid", uuid)
+		ctx := context.WithValue(r.Context(), "UserID", uuid)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }

@@ -5,8 +5,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-
-	"github.com/gofrs/uuid"
 )
 
 type Data struct {
@@ -27,25 +25,25 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uuidCtx := r.Context().Value("uuid")
-	uuid := uuidCtx.(uuid.UUID)
+	idCtx := r.Context().Value("UserID")
+	id := idCtx.(models.UserID)
 
 	switch r.Method {
 	case http.MethodGet:
 
-		userInfo, err := h.service.GetUsersInfoByUUIDService(uuid)
+		userInfo, err := h.service.GetUsersInfoByUUIDService(id)
 		if err != nil {
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
-		usersPost, err := h.service.GetUsersPostInService(uuid)
+		usersPost, err := h.service.GetUsersPostInService(id)
 		if err != nil {
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
-		userLikePosts, err := h.service.GetUserLikePostsInService(uuid)
+		userLikePosts, err := h.service.GetUsersLikedPosts(id)
 		if err != nil {
 			log.Print(err)
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

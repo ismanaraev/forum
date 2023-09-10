@@ -35,10 +35,11 @@ func (u *UserService) CreateUserService(user models.User) (int, error) {
 	if !userValidation(user) {
 		return http.StatusBadRequest, fmt.Errorf("Create user in service: %w", err)
 	}
-	user.Uuid, err = u.gen.NewV4()
+	userUuid, err := u.gen.NewV4()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("Create user in service: %w", err)
 	}
+	user.ID = models.UserID(userUuid)
 	user.Password, err = generateHashPassword(user.Password)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("Create user in service: %w", err)
@@ -79,7 +80,7 @@ func (u *UserService) GetUserInfoService(user models.User) (models.User, error) 
 }
 
 // Получения данных юзера из БД c помощью токена
-func (u *UserService) GetUsersInfoByUUIDService(id uuid.UUID) (models.User, error) {
+func (u *UserService) GetUsersInfoByUUIDService(id models.UserID) (models.User, error) {
 	userInfo, err := u.repo.GetUsersInfoByUUID(id)
 	if err != nil {
 		return models.User{}, err

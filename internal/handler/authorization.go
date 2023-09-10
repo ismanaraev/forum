@@ -5,8 +5,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-
-	"github.com/gofrs/uuid"
 )
 
 // // авторизация
@@ -141,12 +139,12 @@ func (h *Handler) logOutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uuidCtx := r.Context().Value("uuid")
-	if uuidCtx == nil {
+	idCtx := r.Context().Value("UserID")
+	if idCtx == nil {
 		errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	uuidStmt := uuidCtx.(uuid.UUID)
+	idStmt := idCtx.(models.UserID)
 
 	cookie := http.Cookie{
 		Name:   "session_name",
@@ -154,7 +152,7 @@ func (h *Handler) logOutHandler(w http.ResponseWriter, r *http.Request) {
 		MaxAge: -1,
 	}
 	http.SetCookie(w, &cookie)
-	err := h.service.DeleteSessionService(uuidStmt)
+	err := h.service.DeleteSessionService(idStmt)
 	if err != nil {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

@@ -11,8 +11,6 @@ import (
 	"time"
 
 	"forumv2/internal/models"
-
-	"github.com/gofrs/uuid"
 )
 
 func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +25,7 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-	post, err := h.service.GetPostByIDinService(postID)
+	post, err := h.service.GetPostByIDinService(models.PostID(postID))
 	if err != nil {
 		log.Print(err)
 		if errors.Is(err, sql.ErrNoRows) {
@@ -49,8 +47,8 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	uuidCtx := r.Context().Value("uuid")
-	if uuidCtx == nil {
+	idCtx := r.Context().Value("UserID")
+	if idCtx == nil {
 		res := struct {
 			User    models.User
 			Post    models.Post
@@ -64,8 +62,8 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	uuid := uuidCtx.(uuid.UUID)
-	user, err := h.service.GetUsersInfoByUUIDService(uuid)
+	id := idCtx.(models.UserID)
+	user, err := h.service.GetUsersInfoByUUIDService(id)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -96,13 +94,13 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 
 	case http.MethodPost:
-		uuidCtx := r.Context().Value("uuid")
-		if uuidCtx == nil {
+		idCtx := r.Context().Value("UserID")
+		if idCtx == nil {
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		uuid := uuidCtx.(uuid.UUID)
-		user, err := h.service.GetUsersInfoByUUIDService(uuid)
+		id := idCtx.(models.UserID)
+		user, err := h.service.GetUsersInfoByUUIDService(id)
 		if err != nil {
 			log.Print(err)
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -126,41 +124,36 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		categoriesArr := r.PostForm["categories"]
-		categoriesArr = append(categoriesArr, "All")
-		categories, err := h.service.CreateCategory(categoriesArr)
-		if err != nil {
-			log.Print(err)
-			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
+		for _, val := range categoriesArr {
+			err = h.service.CreateCategory(val)
+			if err != nil {
+				log.Print(err)
+				errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+				return
+			}
 		}
-
-		t := time.Now()
-		timeFormat := t.Format("15:04:04,02 January 2006")
 		post := models.Post{
-			Uuid:       uuid,
-			Title:      title,
-			Content:    content,
-			Author:     user.Username,
-			CreatedAt:  timeFormat,
-			Categories: categories,
-			Like:       0,
-			Dislike:    0,
+			Title:     title,
+			Content:   content,
+			Author:    user,
+			CreatedAt: time.Now(),
+			Like:      0,
+			Dislike:   0,
 		}
 		err = h.service.CheckPostInput(post)
 		if err != nil {
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		id, err := h.service.CreatePostService(post)
+		postId, err := h.service.CreatePostService(post)
 		if err != nil {
 			log.Print(err)
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, PostAddress+strconv.FormatInt(id, 10), http.StatusSeeOther)
+		http.Redirect(w, r, PostAddress+strconv.FormatInt(int64(postId), 10), http.StatusSeeOther)
 	default:
 		errorHeader(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
-
 	}
 }

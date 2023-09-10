@@ -66,7 +66,7 @@ func (r *ReactionsStorage) UpdateCommentLikeStatus(like models.LikeComment) erro
 	return nil
 }
 
-func (r *ReactionsStorage) GetUserIDfromLikePost(like models.LikePost) (int64, error) {
+func (r *ReactionsStorage) GetUserIDfromLikePost(like models.LikePost) (models.PostID, error) {
 	row := r.db.QueryRow("SELECT postID FROM likePost WHERE userID=$1", like.UserID)
 	temp := models.LikePost{}
 	err := row.Scan(&temp.PostID)

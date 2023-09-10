@@ -6,8 +6,10 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+type UserID uuid.UUID
+
 type User struct {
-	Uuid       uuid.UUID `json:"uuid"`
+	ID         UserID    `json:"uuid"`
 	Name       string    `json:"name"`
 	Username   string    `json:"username"`
 	Email      string    `json:"email"`

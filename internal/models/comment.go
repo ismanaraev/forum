@@ -2,7 +2,7 @@ package models
 
 type Comment struct {
 	ID        int
-	PostID    int    `json:"postid"`
+	PostID    PostID `json:"postid"`
 	Author    string `json:"author"`
 	Content   string `json:"content"`
 	Like      int    `json:"like"`

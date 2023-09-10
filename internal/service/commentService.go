@@ -34,7 +34,7 @@ func (c *CommentService) GetAllCommentsInService() ([]models.Comment, error) {
 	return c.repo.GetAllComments()
 }
 
-func (c *CommentService) GetCommentsByIDinService(postID int64) ([]models.Comment, error) {
+func (c *CommentService) GetCommentsByIDinService(postID models.PostID) ([]models.Comment, error) {
 	return c.repo.GetCommentsByID(postID)
 }
 

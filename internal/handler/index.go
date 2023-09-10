@@ -5,8 +5,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-
-	"github.com/gofrs/uuid"
 )
 
 type AllData struct {
@@ -37,8 +35,8 @@ func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uuidCtx := r.Context().Value("uuid")
-	if uuidCtx == nil {
+	idCtx := r.Context().Value("UserID")
+	if idCtx == nil {
 		result := &AllData{
 			Post: res,
 		}
@@ -49,9 +47,9 @@ func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	uuid := uuidCtx.(uuid.UUID)
+	id := idCtx.(models.UserID)
 
-	userInfo, err := h.service.GetUsersInfoByUUIDService(uuid)
+	userInfo, err := h.service.GetUsersInfoByUUIDService(id)
 	if err != nil {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

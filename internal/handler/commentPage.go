@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/gofrs/uuid"
 )
 
 func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
@@ -14,13 +12,13 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	uuidCtx := r.Context().Value("uuid")
-	if uuidCtx == nil {
+	idCtx := r.Context().Value("UserID")
+	if idCtx == nil {
 		errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	uuid := uuidCtx.(uuid.UUID)
-	user, err := h.service.GetUsersInfoByUUIDService(uuid)
+	id := idCtx.(models.UserID)
+	user, err := h.service.GetUsersInfoByUUIDService(id)
 	if err != nil {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -45,7 +43,7 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 	timeFormat := t.Format("15:04:04,02 January 2006")
 
 	comm := models.Comment{
-		PostID:    postID,
+		PostID:    models.PostID(postID),
 		Author:    user.Username,
 		Content:   content,
 		Like:      0,

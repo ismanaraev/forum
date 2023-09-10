@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"forumv2/internal/models"
 	"time"
-
-	"github.com/gofrs/uuid"
 )
 
 type Repository struct {
@@ -21,34 +19,35 @@ type User interface {
 	CreateUser(user models.User) (int, error)
 	GetUserInfo(user models.User) (models.User, error)
 	GetUsersEmail(user models.User) (models.User, error)
-	GetUsersInfoByUUID(id uuid.UUID) (models.User, error) //++
+	GetUsersInfoByUUID(id models.UserID) (models.User, error) //++
 	CheckUserEmail(email string) (bool, error)
 	CheckUserUsername(username string) (bool, error)
 }
 
 type Post interface {
-	CreatePost(post models.Post) (int64, error)
+	CreatePost(post models.Post) (models.PostID, error)
 
 	GetAllPost() ([]models.Post, error)
-	GetPostByID(id int64) (models.Post, error)
-	GetUsersPost(uuid uuid.UUID) ([]models.Post, error)
-	GetPostIdWithUUID(uuid uuid.UUID) ([]int64, error)
-	GetUsersLikePosts(i []int64) ([]models.Post, error)
+	GetPostByID(id models.PostID) (models.Post, error)
+	GetPostsByUserID(uuid models.UserID) ([]models.Post, error)
+	GetUsersLikePosts(id models.UserID) ([]models.Post, error)
 	GetPostsByCategory(category models.Category) ([]models.Post, error)
-
+	FilterPostsByMultipleCategories(categories []models.Category) ([]models.Post, error)
+	CreateCategory(name string) error
+	GetCategoryByName(name string) (models.Category, error)
 	UpdatePost(models.Post) error
 }
 
 type Session interface {
-	GetSessionFromDB(token string) (uuid.UUID, error)
-	DeleteSessionFromDB(uuid.UUID) error
+	GetSessionFromDB(token string) (models.UserID, error)
+	DeleteSessionFromDB(models.UserID) error
 }
 
 type Comments interface {
 	CreateComments(models.Comment) error
 
 	GetAllComments() ([]models.Comment, error)
-	GetCommentsByID(postID int64) ([]models.Comment, error)
+	GetCommentsByID(postID models.PostID) ([]models.Comment, error)
 	GetCommentByCommentID(commentID int) (models.Comment, error)
 
 	UpdateComment(models.Comment) error
@@ -58,7 +57,7 @@ type Reactions interface {
 	CreateLikeForPost(like models.LikePost) (models.LikePost, error)
 	CreateLikeForComment(like models.LikeComment) (models.LikeComment, error)
 
-	GetUserIDfromLikePost(like models.LikePost) (int64, error)
+	GetUserIDfromLikePost(like models.LikePost) (models.PostID, error)
 	GetLikeStatusByPostAndUserID(like models.LikePost) (models.LikeStatus, error)
 	GetLikeStatusByCommentAndUserID(like models.LikeComment) (models.LikeStatus, error)
 

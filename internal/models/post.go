@@ -1,16 +1,16 @@
 package models
 
-import "github.com/gofrs/uuid"
+import "time"
+
+type PostID int64
 
 type Post struct {
-	Uuid            uuid.UUID `json:"uuid"`
-	ID              int64     `json:"id"`
-	Title           string    `json:"title"`
-	Content         string    `json:"content"`
-	Author          string    `json:"author"`
-	CreatedAt       string    `json:"createdat"`
-	Categories      Category  `json:"categories"`
-	CategoriesArray []string
-	Like            int `json:"like"`
-	Dislike         int `json:"dislike"`
+	ID         PostID     `json:"id"`
+	Title      string     `json:"title"`
+	Content    string     `json:"content"`
+	Author     User       `json:"author"`
+	CreatedAt  time.Time  `json:"createdat"`
+	Categories []Category `json:"categories"`
+	Like       int        `json:"like"`
+	Dislike    int        `json:"dislike"`
 }

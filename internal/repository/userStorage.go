@@ -8,8 +8,6 @@ import (
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/gofrs/uuid"
 )
 
 type UserStorage struct {
@@ -31,7 +29,7 @@ func (u *UserStorage) CreateUser(user models.User) (int, error) {
 		return http.StatusInternalServerError, fmt.Errorf("Error in CreateUser method in repository: %w", err)
 	}
 
-	_, err = query.Exec(user.Uuid, user.Name, user.Username, user.Email, user.Password)
+	_, err = query.Exec(user.ID, user.Name, user.Username, user.Email, user.Password)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("Error in CreateUser method in repository: %w", err)
 	}
@@ -49,7 +47,7 @@ func (u *UserStorage) SetSession(user models.User, token string, time time.Time)
 		return fmt.Errorf("Error in SetSession method in repository: %w", err)
 	}
 
-	_, err = query.Exec(token, time, user.Uuid)
+	_, err = query.Exec(token, time, user.ID)
 	if err != nil {
 		return fmt.Errorf("Error in SetSession method in repository: %w", err)
 	}
@@ -63,7 +61,7 @@ func (u *UserStorage) GetUserInfo(user models.User) (models.User, error) {
 	row := u.db.QueryRow("SELECT uuid,name,username,email,password FROM users WHERE email=$1", user.Email)
 
 	temp := models.User{}
-	err := row.Scan(&temp.Uuid, &temp.Name, &temp.Username, &temp.Email, &temp.Password)
+	err := row.Scan(&temp.ID, &temp.Name, &temp.Username, &temp.Email, &temp.Password)
 	if err != nil {
 		log.Printf("Error with GetUserInfo in repository: %v\n", err)
 		return models.User{}, err
@@ -85,7 +83,7 @@ func (u *UserStorage) GetUsersEmail(user models.User) (models.User, error) {
 }
 
 // Получить информацию юзера по uuid
-func (u *UserStorage) GetUsersInfoByUUID(id uuid.UUID) (models.User, error) {
+func (u *UserStorage) GetUsersInfoByUUID(id models.UserID) (models.User, error) {
 	row := u.db.QueryRow("SELECT name,username,email,password FROM users WHERE uuid=$1", id)
 
 	temp := models.User{}

@@ -1,7 +1,5 @@
 package models
 
-import "github.com/gofrs/uuid"
-
 type LikeStatus int
 
 const (
@@ -11,7 +9,7 @@ const (
 )
 
 type LikePost struct {
-	UserID uuid.UUID  `json:"userid"`
-	PostID int64      `json:"postid"`
+	UserID UserID     `json:"userid"`
+	PostID PostID     `json:"postid"`
 	Status LikeStatus `json:"status"`
 }

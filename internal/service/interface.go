@@ -3,8 +3,6 @@ package service
 import (
 	"forumv2/internal/models"
 	"forumv2/internal/repository"
-
-	"github.com/gofrs/uuid"
 )
 
 type Service struct {
@@ -20,30 +18,31 @@ type User interface {
 	CreateUserService(user models.User) (int, error)
 	AuthorizationUserService(models.User) (string, error)
 	GetUserInfoService(user models.User) (models.User, error)
-	GetUsersInfoByUUIDService(id uuid.UUID) (models.User, error)
+	GetUsersInfoByUUIDService(id models.UserID) (models.User, error)
 	CheckUserEmail(email string) (bool, error)
 	CheckUserUsername(username string) (bool, error)
 }
 
 type Post interface {
-	CreatePostService(post models.Post) (int64, error)
+	CreatePostService(post models.Post) (models.PostID, error)
 	GetAllPostService() ([]models.Post, error)
-	GetUsersPostInService(uuid uuid.UUID) ([]models.Post, error)
-	GetUserLikePostsInService(uuid uuid.UUID) ([]models.Post, error)
-	GetPostByIDinService(id int64) (models.Post, error)
+	GetUsersPostInService(uuid models.UserID) ([]models.Post, error)
+	GetUsersLikedPosts(id models.UserID) ([]models.Post, error)
+	GetPostByIDinService(id models.PostID) (models.Post, error)
 	FilterPostsByCategories([]string) ([]models.Post, error)
-	CreateCategory([]string) (models.Category, error)
+	CreateCategory(string) error
+	GetCategoryByName(string) (models.Category, error)
 	CheckPostInput(models.Post) error
 }
 
 type Session interface {
-	DeleteSessionService(uuid uuid.UUID) error
-	GetSessionService(token string) (uuid.UUID, error)
+	DeleteSessionService(id models.UserID) error
+	GetSessionService(token string) (models.UserID, error)
 }
 
 type Comments interface {
 	GetAllCommentsInService() ([]models.Comment, error)
-	GetCommentsByIDinService(postID int64) ([]models.Comment, error)
+	GetCommentsByIDinService(postID models.PostID) ([]models.Comment, error)
 	CreateCommentsInService(com models.Comment) error
 	CheckCommentInput(models.Comment) error
 }

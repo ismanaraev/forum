@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-
-	"github.com/gofrs/uuid"
 )
 
 func (h *Handler) LikeComment(w http.ResponseWriter, r *http.Request) {
@@ -14,12 +12,12 @@ func (h *Handler) LikeComment(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	uuidString := r.Context().Value("uuid")
-	if uuidString == nil {
+	idString := r.Context().Value("UserID")
+	if idString == nil {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	uuid := uuidString.(uuid.UUID)
+	id := idString.(models.UserID)
 	postIDStr := r.FormValue("postID")
 	if postIDStr == "" {
 		errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -59,7 +57,7 @@ func (h *Handler) LikeComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	like := models.LikeComment{
-		UserID:     uuid,
+		UserID:     id,
 		CommentsID: commentID,
 		Status:     status,
 	}
@@ -88,7 +86,7 @@ func (h *Handler) LikePost(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	userID := r.Context().Value("uuid").(uuid.UUID)
+	userID := r.Context().Value("UserID").(models.UserID)
 	postID, err := strconv.ParseInt(postIDStr, 10, 64)
 	if err != nil {
 		log.Print(err)
@@ -112,7 +110,7 @@ func (h *Handler) LikePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	like := models.LikePost{
-		PostID: postID,
+		PostID: models.PostID(postID),
 		UserID: userID,
 		Status: status,
 	}

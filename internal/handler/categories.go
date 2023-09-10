@@ -1,11 +1,10 @@
 package handler
 
 import (
+	"forumv2/internal/models"
 	"html/template"
 	"log"
 	"net/http"
-
-	"github.com/gofrs/uuid"
 )
 
 func (h *Handler) FilterByCategory(w http.ResponseWriter, r *http.Request) {
@@ -15,11 +14,6 @@ func (h *Handler) FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	}
 	categoriesArr, ok := r.URL.Query()["category"]
 	if !ok {
-		errorHeader(w, "invalid category", http.StatusBadRequest)
-		return
-	}
-	_, err := h.service.CreateCategory(categoriesArr)
-	if err != nil {
 		errorHeader(w, "invalid category", http.StatusBadRequest)
 		return
 	}
@@ -35,8 +29,8 @@ func (h *Handler) FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, "", http.StatusInternalServerError)
 		return
 	}
-	uuidCtx := r.Context().Value("uuid")
-	if uuidCtx == nil {
+	idCtx := r.Context().Value("UserID")
+	if idCtx == nil {
 		res := AllData{
 			Post: posts,
 		}
@@ -49,8 +43,8 @@ func (h *Handler) FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uuid := uuidCtx.(uuid.UUID)
-	user, err := h.service.GetUsersInfoByUUIDService(uuid)
+	id := idCtx.(models.UserID)
+	user, err := h.service.GetUsersInfoByUUIDService(id)
 	if err != nil {
 		log.Print(err)
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

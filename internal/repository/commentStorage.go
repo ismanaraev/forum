@@ -55,7 +55,7 @@ func (c *CommentStorage) GetAllComments() ([]models.Comment, error) {
 	return allComments, nil
 }
 
-func (c *CommentStorage) GetCommentsByID(postID int64) ([]models.Comment, error) {
+func (c *CommentStorage) GetCommentsByID(postID models.PostID) ([]models.Comment, error) {
 	row, err := c.db.Query("SELECT id,postID,content,author,like,dislike,createdat FROM comments WHERE postID=$1", postID)
 	if err != nil {
 		return nil, fmt.Errorf("[CommentStorage]:Error with GetCommentsByID method in repository: %w", err)
