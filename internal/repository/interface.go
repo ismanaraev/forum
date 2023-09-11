@@ -12,12 +12,13 @@ type Repository struct {
 	Session
 	Comments
 	Reactions
+	Categories
 }
 
 type User interface {
 	SetSession(user models.User, token string, time time.Time) error
 	CreateUser(user models.User) (int, error)
-	GetUserInfo(user models.User) (models.User, error)
+	GetUserInfoByEmail(email string) (models.User, error)
 	GetUsersEmail(user models.User) (models.User, error)
 	GetUsersInfoByUUID(id models.UserID) (models.User, error) //++
 	CheckUserEmail(email string) (bool, error)
@@ -31,10 +32,7 @@ type Post interface {
 	GetPostByID(id models.PostID) (models.Post, error)
 	GetPostsByUserID(uuid models.UserID) ([]models.Post, error)
 	GetUsersLikePosts(id models.UserID) ([]models.Post, error)
-	GetPostsByCategory(category models.Category) ([]models.Post, error)
 	FilterPostsByMultipleCategories(categories []models.Category) ([]models.Post, error)
-	CreateCategory(name string) error
-	GetCategoryByName(name string) (models.Category, error)
 	UpdatePost(models.Post) error
 }
 
@@ -68,12 +66,21 @@ type Reactions interface {
 	DeleteCommentLike(models.LikeComment) error
 }
 
+type Categories interface {
+	CreateCategory(string) error
+	AddCategoryToPost(models.PostID, models.CategoryID) error
+	GetCategoryByName(string) (models.Category, error)
+	GetCategoriesByPostID(models.PostID) ([]models.Category, error)
+	GetPostsByCategory(category models.Category) ([]models.Post, error)
+}
+
 func NewRepository(db *sql.DB) Repository {
 	return Repository{
-		User:      NewUserSQLite(db),
-		Post:      NewPostSQLite(db),
-		Session:   NewSessionSQLite(db),
-		Comments:  NewCommentsSQLite(db),
-		Reactions: NewReactionsSQLite(db),
+		User:       NewUserSQLite(db),
+		Post:       NewPostSQLite(db),
+		Session:    NewSessionSQLite(db),
+		Comments:   NewCommentsSQLite(db),
+		Reactions:  NewReactionsSQLite(db),
+		Categories: NewCategoriesStorage(db),
 	}
 }

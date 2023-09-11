@@ -21,7 +21,7 @@ func (r *ReactionsStorage) CreateLikeForPost(like models.LikePost) (models.LikeP
 	if err != nil {
 		return like, fmt.Errorf("[ReactionStorage]:Error with CreateLikeForPost method in repository: %w", err)
 	}
-	_, err = queryForLike.Exec(like.UserID, like.PostID, like.Status)
+	_, err = queryForLike.Exec(like.UserID.String(), like.PostID, like.Status)
 	if err != nil {
 		return like, fmt.Errorf("[ReactionStorage]:Error with CreateLikeForPost method in repository: %v", err)
 	}
@@ -33,7 +33,7 @@ func (r *ReactionsStorage) CreateLikeForComment(like models.LikeComment) (models
 	if err != nil {
 		return like, fmt.Errorf("[ReactionStorage]:Error with CreateLikeForComment method in repository: %w", err)
 	}
-	_, err = queryForLike.Exec(like.UserID, like.CommentsID, like.Status)
+	_, err = queryForLike.Exec(like.UserID.String(), like.CommentsID, like.Status)
 	if err != nil {
 		return like, fmt.Errorf("[ReactionStorage]:Error with CreateLikeForComment method in repository: %v", err)
 	}
@@ -82,7 +82,7 @@ func (r *ReactionsStorage) GetLikeStatusByPostAndUserID(like models.LikePost) (m
 	if err != nil {
 		return models.NoLike, fmt.Errorf("[ReactionStorage]:Error with GetLikeStatusByPostAndUserID method in repository: %v", err)
 	}
-	res := query.QueryRow(like.UserID, like.PostID)
+	res := query.QueryRow(like.UserID.String(), like.PostID)
 
 	var status models.LikeStatus
 	err = res.Scan(&status)
@@ -101,7 +101,7 @@ func (r *ReactionsStorage) GetLikeStatusByCommentAndUserID(like models.LikeComme
 	if err != nil {
 		return models.NoLike, fmt.Errorf("[ReactionStorage]:Error with GetLikeStatusByCommentAndUserID method in repository: %v", err)
 	}
-	res := query.QueryRow(like.UserID, like.CommentsID)
+	res := query.QueryRow(like.UserID.String(), like.CommentsID)
 	var status models.LikeStatus
 	err = res.Scan(&status)
 	if err != nil {
@@ -119,7 +119,7 @@ func (r *ReactionsStorage) DeleteCommentLike(like models.LikeComment) error {
 	if err != nil {
 		return err
 	}
-	_, err = query.Exec(like.CommentsID, like.UserID)
+	_, err = query.Exec(like.CommentsID, like.UserID.String())
 	if err != nil {
 		return err
 	}
@@ -132,7 +132,7 @@ func (r *ReactionsStorage) DeletePostLike(like models.LikePost) error {
 	if err != nil {
 		return err
 	}
-	_, err = query.Exec(like.PostID, like.UserID)
+	_, err = query.Exec(like.PostID, like.UserID.String())
 	if err != nil {
 		return err
 	}

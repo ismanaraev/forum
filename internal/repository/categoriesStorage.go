@@ -1,11 +1,21 @@
 package repository
 
 import (
+	"database/sql"
 	"fmt"
 	"forumv2/internal/models"
+	"strconv"
 )
 
-func (p *PostStorage) GetCategoriesByPostID(postID models.PostID) ([]models.Category, error) {
+type CategoriesStorage struct {
+	db *sql.DB
+}
+
+func NewCategoriesStorage(db *sql.DB) *CategoriesStorage {
+	return &CategoriesStorage{db: db}
+}
+
+func (p *CategoriesStorage) GetCategoriesByPostID(postID models.PostID) ([]models.Category, error) {
 	var categories []models.Category
 	query, err := p.db.Prepare(`SELECT id, name FROM categories WHERE id IN (SELECT categoryID FROM categoriesPost WHERE PostID = $1)`)
 	if err != nil {
@@ -32,23 +42,24 @@ func (p *PostStorage) FilterPostsByMultipleCategories(categories []models.Catego
 	}
 	var s string
 	for i := 1; i < len(categories); i++ {
-		s += fmt.Sprintf(" AND categoryID=%d", i+1)
+		s += fmt.Sprintf(",$%d", i+1)
 	}
 	var ids []interface{}
 	for _, val := range categories {
 		ids = append(ids, val.ID)
 	}
-	stmt, err := p.db.Prepare(`SELECT postID FROM categoriesPost WHERE categoryID = $1` + s)
+	stmt, err := p.db.Prepare(`SELECT postID FROM categoriesPost WHERE categoryID IN ($1` + s + ")" + "GROUP BY postID HAVING count() = $" + strconv.Itoa(len(categories)+2))
 	if err != nil {
 		return nil, err
 	}
+	ids = append(ids, len(categories))
 	rows, err := stmt.Query(ids...)
 	if err != nil {
 		return nil, err
 	}
-	var postIDS []models.PostID
+	var postIDS []int64
 	for rows.Next() {
-		var temp models.PostID
+		var temp int64
 		err = rows.Scan(&temp)
 		if err != nil {
 			return nil, err
@@ -57,7 +68,7 @@ func (p *PostStorage) FilterPostsByMultipleCategories(categories []models.Catego
 	}
 	var res []models.Post
 	for _, val := range postIDS {
-		post, err := p.GetPostByID(val)
+		post, err := p.GetPostByID(models.PostID(val))
 		if err != nil {
 			return nil, err
 		}
@@ -66,7 +77,7 @@ func (p *PostStorage) FilterPostsByMultipleCategories(categories []models.Catego
 	return res, nil
 }
 
-func (p *PostStorage) CreateCategory(name string) error {
+func (p *CategoriesStorage) CreateCategory(name string) error {
 	stmt, err := p.db.Prepare(`INSERT INTO categories (name) VALUES ($1)`)
 	if err != nil {
 		return err
@@ -75,7 +86,7 @@ func (p *PostStorage) CreateCategory(name string) error {
 	return err
 }
 
-func (p *PostStorage) GetCategoryByName(name string) (models.Category, error) {
+func (p *CategoriesStorage) GetCategoryByName(name string) (models.Category, error) {
 	stmt, err := p.db.Prepare(`SELECT id,name FROM categories WHERE name = $1`)
 	if err != nil {
 		return models.Category{}, err
@@ -87,4 +98,13 @@ func (p *PostStorage) GetCategoryByName(name string) (models.Category, error) {
 		return models.Category{}, err
 	}
 	return res, nil
+}
+
+func (p *CategoriesStorage) AddCategoryToPost(postId models.PostID, categoryId models.CategoryID) error {
+	stmt, err := p.db.Prepare(`INSERT INTO categoriesPost (postID, categoryID) VALUES ($1, $2)`)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(postId, categoryId)
+	return err
 }

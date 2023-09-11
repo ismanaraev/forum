@@ -8,7 +8,7 @@ import (
 
 var tables []string = []string{
 	`CREATE TABLE IF NOT EXISTS users (
-		uuid TEXT PRIMARY KEY NOT NULL,
+		ID TEXT UNIQUE NOT NULL,
 		name CHAR(50) NOT NULL,
 		username VARCHAR(50) NOT NULL UNIQUE,
 		email VARCHAR(50) NOT NULL UNIQUE, 
@@ -24,8 +24,7 @@ var tables []string = []string{
 		createdat INTEGER NOT NULL,
 		like INTEGER DEFAULT 0,
 		dislike INTEGER DEFAULT 0,
-		FOREIGN KEY (uuid) REFERENCES users(uuid) ON DELETE CASCADE,
-		FOREIGN KEY (author) REFERENCES users(username) ON DELETE CASCADE
+		FOREIGN KEY (author) REFERENCES users(ID) ON DELETE CASCADE
 	);`,
 	`CREATE TABLE IF NOT EXISTS comments (
 		ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -43,7 +42,7 @@ var tables []string = []string{
 		userID TEXT,
 		postID INTEGER DEFAULT 0,
 		status INTEGER DEFAULT 0,
-		FOREIGN KEY (userID) REFERENCES users(uuid) ON DELETE CASCADE,
+		FOREIGN KEY (userID) REFERENCES users(ID) ON DELETE CASCADE,
 		FOREIGN KEY (postID) REFERENCES post(ID) ON DELETE CASCADE
 		);`,
 	`CREATE TABLE IF NOT EXISTS likeComments(
@@ -51,7 +50,7 @@ var tables []string = []string{
 		userID TEXT,
 		commentsID INTEGER DEFAULT 0,
 		status INTEGER DEFAULT 0,
-		FOREIGN KEY (userID) REFERENCES users(uuid) ON DELETE CASCADE,
+		FOREIGN KEY (userID) REFERENCES users(ID) ON DELETE CASCADE,
 		FOREIGN KEY (commentsID) REFERENCES comments(ID) ON DELETE CASCADE
 		);`,
 	`CREATE TABLE IF NOT EXISTS categories(

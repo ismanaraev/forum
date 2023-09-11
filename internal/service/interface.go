@@ -55,7 +55,7 @@ type Reactions interface {
 func NewService(repo repository.Repository) Service {
 	return Service{
 		User:      NewUserService(repo.User),
-		Post:      NewPostService(repo.Post),
+		Post:      NewPostService(repo.Post, repo.User, repo.Categories),
 		Session:   NewSessionService(repo.Session),
 		Comments:  NewCommentsService(repo.Comments),
 		Reactions: NewReactionsService(repo.Reactions, repo.Post, repo.Comments),

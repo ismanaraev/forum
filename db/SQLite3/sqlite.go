@@ -7,8 +7,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func Database() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "./db/SQLite3/store.db")
+func Database(path string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return nil, fmt.Errorf("can't open database: %w", err)
 	}

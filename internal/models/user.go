@@ -17,3 +17,16 @@ type User struct {
 	Token      string    `json:"token"`
 	ExpireTime time.Time `json:"expiretime"`
 }
+
+func (u UserID) String() string {
+	res := uuid.UUID(u)
+	return res.String()
+}
+
+func UserIDFromString(s string) (UserID, error) {
+	res, err := uuid.FromString(s)
+	if err != nil {
+		return UserID{}, err
+	}
+	return UserID(res), nil
+}

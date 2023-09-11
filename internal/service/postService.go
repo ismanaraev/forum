@@ -8,13 +8,16 @@ import (
 )
 
 type PostService struct {
-	repo     repository.Post
-	userRepo repository.User
+	repo           repository.Post
+	userRepo       repository.User
+	categoriesRepo repository.Categories
 }
 
-func NewPostService(repo repository.Post) Post {
+func NewPostService(repo repository.Post, userRepo repository.User, catRepo repository.Categories) Post {
 	return &PostService{
-		repo: repo,
+		repo:           repo,
+		userRepo:       userRepo,
+		categoriesRepo: catRepo,
 	}
 }
 
@@ -54,6 +57,11 @@ func (p *PostService) GetAllPostService() ([]models.Post, error) {
 		if err != nil {
 			return nil, err
 		}
+		categories, err := p.categoriesRepo.GetCategoriesByPostID(posts[i].ID)
+		if err != nil {
+			return nil, err
+		}
+		posts[i].Categories = categories
 	}
 	return posts, nil
 }
@@ -63,6 +71,16 @@ func (p *PostService) GetPostByIDinService(id models.PostID) (models.Post, error
 	if err != nil {
 		return models.Post{}, err
 	}
+	author, err := p.userRepo.GetUsersInfoByUUID(post.Author.ID)
+	if err != nil {
+		return models.Post{}, err
+	}
+	categories, err := p.categoriesRepo.GetCategoriesByPostID(post.ID)
+	if err != nil {
+		return models.Post{}, err
+	}
+	post.Author = author
+	post.Categories = categories
 	return post, nil
 }
 
@@ -76,6 +94,11 @@ func (p *PostService) GetUsersPostInService(id models.UserID) ([]models.Post, er
 		return nil, err
 	}
 	for i := range posts {
+		categories, err := p.categoriesRepo.GetCategoriesByPostID(posts[i].ID)
+		if err != nil {
+			return nil, err
+		}
+		posts[i].Categories = categories
 		posts[i].Author = user
 	}
 	return posts, nil
@@ -84,7 +107,7 @@ func (p *PostService) GetUsersPostInService(id models.UserID) ([]models.Post, er
 func (p *PostService) FilterPostsByCategories(categoriesString []string) ([]models.Post, error) {
 	var categories []models.Category
 	for _, val := range categoriesString {
-		temp, err := p.repo.GetCategoryByName(val)
+		temp, err := p.categoriesRepo.GetCategoryByName(val)
 		if err != nil {
 			return nil, err
 		}
@@ -94,17 +117,45 @@ func (p *PostService) FilterPostsByCategories(categoriesString []string) ([]mode
 	if err != nil {
 		return nil, err
 	}
+	for i := range posts {
+		author, err := p.userRepo.GetUsersInfoByUUID(posts[i].Author.ID)
+		if err != nil {
+			return nil, err
+		}
+		postCats, err := p.categoriesRepo.GetCategoriesByPostID(posts[i].ID)
+		if err != nil {
+			return nil, err
+		}
+		posts[i].Author = author
+		posts[i].Categories = postCats
+	}
 	return posts, nil
 }
 
 func (p *PostService) CreateCategory(name string) error {
-	return p.repo.CreateCategory(name)
+	return p.categoriesRepo.CreateCategory(name)
 }
 
 func (p *PostService) GetCategoryByName(name string) (models.Category, error) {
-	return p.repo.GetCategoryByName(name)
+	return p.categoriesRepo.GetCategoryByName(name)
 }
 
 func (p *PostService) GetUsersLikedPosts(id models.UserID) ([]models.Post, error) {
-	return p.repo.GetUsersLikePosts(id)
+	posts, err := p.repo.GetUsersLikePosts(id)
+	if err != nil {
+		return nil, err
+	}
+	author, err := p.userRepo.GetUsersInfoByUUID(id)
+	if err != nil {
+		return nil, err
+	}
+	for i := range posts {
+		cats, err := p.categoriesRepo.GetCategoriesByPostID(posts[i].ID)
+		if err != nil {
+			return nil, err
+		}
+		posts[i].Categories = cats
+		posts[i].Author = author
+	}
+	return posts, nil
 }

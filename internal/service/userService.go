@@ -50,7 +50,7 @@ func (u *UserService) CreateUserService(user models.User) (int, error) {
 // Проверка на авторизацию
 func (u *UserService) AuthorizationUserService(user models.User) (string, error) {
 	var err error
-	checkUser, err := u.repo.GetUserInfo(user)
+	checkUser, err := u.repo.GetUserInfoByEmail(user.Email)
 	if err != nil {
 		return "User is exist", err
 	}
@@ -72,7 +72,7 @@ func (u *UserService) AuthorizationUserService(user models.User) (string, error)
 
 // Получения данных юзера из БД
 func (u *UserService) GetUserInfoService(user models.User) (models.User, error) {
-	userInfo, err := u.repo.GetUserInfo(user) // Получает информацию с помощью почты
+	userInfo, err := u.repo.GetUserInfoByEmail(user.Email) // Получает информацию с помощью почты
 	if err != nil {
 		return models.User{}, err
 	}

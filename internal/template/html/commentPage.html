@@ -31,14 +31,14 @@
   </nav>
 
         <fieldset class="field">
-            <legend>{{ .Post.Author }}</legend>
+            <legend>{{ .Post.Author.Name }}</legend>
             <div class="content-limit">
              <h3>{{ .Post.Title }}</h3>
              <div class="comment-content">
                     {{  .Post.Content }}
                     </div>
                 <br><br>
-                <p>Category:{{ range .Post.CategoriesArray }}{{.}} {{end}}</p> 
+                <p>Category:{{ range .Post.Categories }}{{.Name}} {{end}}</p> 
                 <div class="reactions">
                 <form action="/like-post" method="POST">
                     <input type="hidden" name="postID" value="{{.Post.ID}}">

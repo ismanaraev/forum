@@ -40,7 +40,7 @@ func (h *Handler) userSignIn(w http.ResponseWriter, r *http.Request) {
 		}
 		token, err := h.service.AuthorizationUserService(data)
 		if err != nil {
-			errorHeader(w, "Email or Password is incorrect", http.StatusBadRequest)
+			errorHeader(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		cookie := http.Cookie{
@@ -102,7 +102,7 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 		EmailExist, err := h.service.CheckUserEmail(email[0])
 		if err != nil {
 			log.Print(err)
-			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			errorHeader(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if EmailExist {
@@ -112,16 +112,16 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 		UsernameExist, err := h.service.CheckUserUsername(username[0])
 		if err != nil {
 			log.Print(err)
-			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			errorHeader(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if UsernameExist {
 			errorHeader(w, "user with this username already exists", http.StatusBadRequest)
 			return
 		}
-		status, err := h.service.User.CreateUserService(data)
+		status, err := h.service.CreateUserService(data)
 		if err != nil {
-			errorHeader(w, "One field is filled out incorrectly", status)
+			errorHeader(w, err.Error(), status)
 			// http.Error(w, http.StatusText(status), status)
 			log.Printf("User not created")
 			return
@@ -154,7 +154,7 @@ func (h *Handler) logOutHandler(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &cookie)
 	err := h.service.DeleteSessionService(idStmt)
 	if err != nil {
-		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorHeader(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)

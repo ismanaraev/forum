@@ -12,7 +12,7 @@ import (
 
 func main() {
 	// statment, _ := db.Database()
-	db, err := db.Database()
+	db, err := db.Database("./db/SQLite3/data.db")
 	if err != nil {
 		log.Println(err)
 	}
