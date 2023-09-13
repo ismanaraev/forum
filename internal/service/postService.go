@@ -3,25 +3,24 @@ package service
 import (
 	"errors"
 	"forumv2/internal/models"
-	"forumv2/internal/repository"
 	"strings"
 )
 
-type PostService struct {
-	repo           repository.Post
-	userRepo       repository.User
-	categoriesRepo repository.Categories
+type postService struct {
+	repo           Post
+	userRepo       User
+	categoriesRepo Categories
 }
 
-func NewPostService(repo repository.Post, userRepo repository.User, catRepo repository.Categories) Post {
-	return &PostService{
+func newPostService(repo Post, userRepo User, catRepo Categories) *postService {
+	return &postService{
 		repo:           repo,
 		userRepo:       userRepo,
 		categoriesRepo: catRepo,
 	}
 }
 
-func (p *PostService) CheckPostInput(post models.Post) error {
+func (p *postService) CheckPostInput(post models.Post) error {
 	if len(post.Title) == 0 {
 		return errors.New("empty title")
 	}
@@ -43,11 +42,11 @@ func (p *PostService) CheckPostInput(post models.Post) error {
 	return nil
 }
 
-func (p *PostService) CreatePostService(post models.Post) (models.PostID, error) {
+func (p *postService) CreatePostService(post models.Post) (models.PostID, error) {
 	return p.repo.CreatePost(post)
 }
 
-func (p *PostService) GetAllPostService() ([]models.Post, error) {
+func (p *postService) GetAllPostService() ([]models.Post, error) {
 	posts, err := p.repo.GetAllPost()
 	if err != nil {
 		return nil, err
@@ -66,7 +65,7 @@ func (p *PostService) GetAllPostService() ([]models.Post, error) {
 	return posts, nil
 }
 
-func (p *PostService) GetPostByIDinService(id models.PostID) (models.Post, error) {
+func (p *postService) GetPostByIDinService(id models.PostID) (models.Post, error) {
 	post, err := p.repo.GetPostByID(id)
 	if err != nil {
 		return models.Post{}, err
@@ -84,7 +83,7 @@ func (p *PostService) GetPostByIDinService(id models.PostID) (models.Post, error
 	return post, nil
 }
 
-func (p *PostService) GetUsersPostInService(id models.UserID) ([]models.Post, error) {
+func (p *postService) GetUsersPostInService(id models.UserID) ([]models.Post, error) {
 	posts, err := p.repo.GetPostsByUserID(id)
 	if err != nil {
 		return nil, err
@@ -104,7 +103,7 @@ func (p *PostService) GetUsersPostInService(id models.UserID) ([]models.Post, er
 	return posts, nil
 }
 
-func (p *PostService) FilterPostsByCategories(categoriesString []string) ([]models.Post, error) {
+func (p *postService) FilterPostsByCategories(categoriesString []string) ([]models.Post, error) {
 	var categories []models.Category
 	for _, val := range categoriesString {
 		temp, err := p.categoriesRepo.GetCategoryByName(val)
@@ -132,15 +131,15 @@ func (p *PostService) FilterPostsByCategories(categoriesString []string) ([]mode
 	return posts, nil
 }
 
-func (p *PostService) CreateCategory(name string) error {
+func (p *postService) CreateCategory(name string) error {
 	return p.categoriesRepo.CreateCategory(name)
 }
 
-func (p *PostService) GetCategoryByName(name string) (models.Category, error) {
+func (p *postService) GetCategoryByName(name string) (models.Category, error) {
 	return p.categoriesRepo.GetCategoryByName(name)
 }
 
-func (p *PostService) GetUsersLikedPosts(id models.UserID) ([]models.Post, error) {
+func (p *postService) GetUsersLikedPosts(id models.UserID) ([]models.Post, error) {
 	posts, err := p.repo.GetUsersLikePosts(id)
 	if err != nil {
 		return nil, err

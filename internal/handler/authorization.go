@@ -119,9 +119,9 @@ func (h *Handler) userSignUp(w http.ResponseWriter, r *http.Request) {
 			errorHeader(w, "user with this username already exists", http.StatusBadRequest)
 			return
 		}
-		status, err := h.service.CreateUserService(data)
+		err = h.service.CreateUserService(data)
 		if err != nil {
-			errorHeader(w, err.Error(), status)
+			errorHeader(w, err.Error(), http.StatusBadRequest)
 			// http.Error(w, http.StatusText(status), status)
 			log.Printf("User not created")
 			return

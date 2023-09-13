@@ -2,22 +2,19 @@ package service
 
 import (
 	"forumv2/internal/models"
-	"forumv2/internal/repository"
 )
 
-type SessionService struct {
-	repo repository.Session
+type sessionService struct {
+	repo Session
 }
 
-func NewSessionService(repo repository.Session) *SessionService {
-	return &SessionService{
+func newSessionService(repo Session) *sessionService {
+	return &sessionService{
 		repo: repo,
 	}
 }
 
-// RQ-request
-// Запрос на удаления токена и время токена
-func (s *SessionService) DeleteSessionService(uuid models.UserID) error {
+func (s *sessionService) DeleteSessionService(uuid models.UserID) error {
 	err := s.repo.DeleteSessionFromDB(uuid)
 	if err != nil {
 		return err
@@ -25,8 +22,7 @@ func (s *SessionService) DeleteSessionService(uuid models.UserID) error {
 	return nil
 }
 
-// Получаем по токену username
-func (s *SessionService) GetSessionService(token string) (models.UserID, error) {
+func (s *sessionService) GetSessionService(token string) (models.UserID, error) {
 	uuid, err := s.repo.GetSessionFromDB(token)
 	if err != nil {
 		return uuid, err

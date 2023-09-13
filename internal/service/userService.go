@@ -5,9 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"forumv2/internal/models"
-	"forumv2/internal/repository"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -16,39 +14,39 @@ import (
 
 const TOKEN_SECRET = 15
 
-type UserService struct {
-	repo repository.User
+type userService struct {
+	repo User
 	gen  uuid.Generator
 }
 
-func NewUserService(repo repository.User) *UserService {
-	return &UserService{
+func newUserService(repo User) *userService {
+	return &userService{
 		gen:  uuid.NewGen(),
 		repo: repo,
 	}
 }
 
 // Добавление нового юзера в базу,запрос на репу
-func (u *UserService) CreateUserService(user models.User) (int, error) {
+func (u *userService) CreateUserService(user models.User) error {
 	var err error
 
 	if !userValidation(user) {
-		return http.StatusBadRequest, fmt.Errorf("Create user in service: %w", err)
+		return fmt.Errorf("Create user in service: %w", err)
 	}
 	userUuid, err := u.gen.NewV4()
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("Create user in service: %w", err)
+		return fmt.Errorf("Create user in service: %w", err)
 	}
 	user.ID = models.UserID(userUuid)
 	user.Password, err = generateHashPassword(user.Password)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("Create user in service: %w", err)
+		return fmt.Errorf("Create user in service: %w", err)
 	}
 	return u.repo.CreateUser(user)
 }
 
 // Проверка на авторизацию
-func (u *UserService) AuthorizationUserService(user models.User) (string, error) {
+func (u *userService) AuthorizationUserService(user models.User) (string, error) {
 	var err error
 	checkUser, err := u.repo.GetUserInfoByEmail(user.Email)
 	if err != nil {
@@ -71,7 +69,7 @@ func (u *UserService) AuthorizationUserService(user models.User) (string, error)
 }
 
 // Получения данных юзера из БД
-func (u *UserService) GetUserInfoService(user models.User) (models.User, error) {
+func (u *userService) GetUserInfoService(user models.User) (models.User, error) {
 	userInfo, err := u.repo.GetUserInfoByEmail(user.Email) // Получает информацию с помощью почты
 	if err != nil {
 		return models.User{}, err
@@ -80,7 +78,7 @@ func (u *UserService) GetUserInfoService(user models.User) (models.User, error) 
 }
 
 // Получения данных юзера из БД c помощью токена
-func (u *UserService) GetUsersInfoByUUIDService(id models.UserID) (models.User, error) {
+func (u *userService) GetUsersInfoByUUIDService(id models.UserID) (models.User, error) {
 	userInfo, err := u.repo.GetUsersInfoByUUID(id)
 	if err != nil {
 		return models.User{}, err
@@ -89,7 +87,7 @@ func (u *UserService) GetUsersInfoByUUIDService(id models.UserID) (models.User, 
 }
 
 // Cоздает токен и время токена и отправляет в БД
-func (u *UserService) CreateSessionService(user models.User) (string, error) {
+func (u *userService) CreateSessionService(user models.User) (string, error) {
 	token := CreateToken()
 	expireTime := time.Now()
 	return token, u.repo.SetSession(user, token, expireTime)
@@ -103,10 +101,10 @@ func CreateToken() string {
 	return hex.EncodeToString(b)
 }
 
-func (u *UserService) CheckUserEmail(email string) (bool, error) {
+func (u *userService) CheckUserEmail(email string) (bool, error) {
 	return u.repo.CheckUserEmail(email)
 }
 
-func (u *UserService) CheckUserUsername(username string) (bool, error) {
+func (u *userService) CheckUserUsername(username string) (bool, error) {
 	return u.repo.CheckUserUsername(username)
 }

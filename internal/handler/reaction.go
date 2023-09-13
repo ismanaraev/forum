@@ -62,7 +62,7 @@ func (h *Handler) LikeComment(w http.ResponseWriter, r *http.Request) {
 		Status:     status,
 	}
 
-	err = h.service.Reactions.LikeCommentService(like)
+	err = h.service.LikeCommentService(like)
 	if err != nil {
 		log.Print(err)
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

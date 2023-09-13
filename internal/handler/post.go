@@ -35,7 +35,7 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	comments, err := h.service.GetCommentsByIDinService(post.ID)
+	comments, err := h.service.GetCommentsByPostID(post.ID)
 	if err != nil {
 		log.Print(err)
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

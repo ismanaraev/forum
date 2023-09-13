@@ -11,126 +11,13 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-//func TestGetCategoriesByPostID(t *testing.T) {
-//	data, err := db.Database("./test.db")
-//	//defer RemoveDB()
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	repo := repository.NewPostSQLite(data)
-//	userRepo := repository.NewUserSQLite(data)
-//	catRepo := repository.NewCategoriesStorage(data)
-//	id, err := uuid.NewV4()
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	user := models.User{
-//		ID: models.UserID(id),
-//	}
-//	_, err = userRepo.CreateUser(user)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	cooking := models.Category{
-//		ID:   models.CategoryID(1),
-//		Name: "Cooking",
-//	}
-//	music := models.Category{
-//		ID:   models.CategoryID(2),
-//		Name: "Music",
-//	}
-//	Puters := models.Category{
-//		ID:   models.CategoryID(3),
-//		Name: "Puters",
-//	}
-//	err = catRepo.CreateCategory(cooking.Name)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	err = catRepo.CreateCategory(music.Name)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	err = catRepo.CreateCategory(Puters.Name)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	expectedPosts := []models.Post{
-//		{
-//			ID:        models.PostID(1),
-//			Title:     "title",
-//			Content:   "content",
-//			Author:    models.User{ID: user.ID},
-//			CreatedAt: time.Now().Truncate(time.Second),
-//		},
-//		{
-//			ID:        models.PostID(2),
-//			Title:     "title2",
-//			Content:   "content2",
-//			Author:    models.User{ID: user.ID},
-//			CreatedAt: time.Now().Truncate(time.Second),
-//		},
-//		{
-//			ID:        models.PostID(3),
-//			Title:     "title3",
-//			Content:   "content3",
-//			Author:    models.User{ID: user.ID},
-//			CreatedAt: time.Now().Truncate(time.Second),
-//		},
-//		{
-//			ID:        models.PostID(4),
-//			Title:     "title4",
-//			Content:   "content4",
-//			Author:    models.User{ID: user.ID},
-//			CreatedAt: time.Now().Truncate(time.Second),
-//		},
-//	}
-//	for i := range expectedPosts {
-//		_, err = repo.CreatePost(expectedPosts[i])
-//		if err != nil {
-//			t.Fatal(err)
-//		}
-//	}
-//	err = catRepo.AddCategoryToPost(expectedPosts[0].ID, cooking.ID)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	err = catRepo.AddCategoryToPost(expectedPosts[0].ID, music.ID)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	err = catRepo.AddCategoryToPost(expectedPosts[0].ID, Puters.ID)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	err = catRepo.AddCategoryToPost(expectedPosts[1].ID, cooking.ID)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	err = catRepo.AddCategoryToPost(expectedPosts[2].ID, cooking.ID)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	expected := []models.Category{cooking, music, Puters}
-//	got, err := catRepo.GetCategoriesByPostID(expectedPosts[0].ID)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	if !reflect.DeepEqual(got, expected) {
-//		t.Logf("categories array mismatch, want %v, got %v", got, expected)
-//		t.Fail()
-//	}
-//}
-
-func TestFilterByMultipleCategories(t *testing.T) {
+func TestGetCategoriesByPostID(t *testing.T) {
 	data, err := db.Database("./test.db")
 	defer RemoveDB()
 	if err != nil {
 		t.Fatal(err)
 	}
-	repo := repository.NewPostSQLite(data)
-	userRepo := repository.NewUserSQLite(data)
-	catRepo := repository.NewCategoriesStorage(data)
+	repo := repository.NewRepository(data)
 	id, err := uuid.NewV4()
 	if err != nil {
 		t.Fatal(err)
@@ -138,7 +25,7 @@ func TestFilterByMultipleCategories(t *testing.T) {
 	user := models.User{
 		ID: models.UserID(id),
 	}
-	_, err = userRepo.CreateUser(user)
+	err = repo.CreateUser(user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -154,15 +41,15 @@ func TestFilterByMultipleCategories(t *testing.T) {
 		ID:   models.CategoryID(3),
 		Name: "Puters",
 	}
-	err = catRepo.CreateCategory(cooking.Name)
+	err = repo.CreateCategory(cooking.Name)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = catRepo.CreateCategory(music.Name)
+	err = repo.CreateCategory(music.Name)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = catRepo.CreateCategory(Puters.Name)
+	err = repo.CreateCategory(Puters.Name)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,27 +89,136 @@ func TestFilterByMultipleCategories(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	err = catRepo.AddCategoryToPost(expectedPosts[0].ID, cooking.ID)
+	err = repo.AddCategoryToPost(expectedPosts[0].ID, cooking.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = catRepo.AddCategoryToPost(expectedPosts[0].ID, music.ID)
+	err = repo.AddCategoryToPost(expectedPosts[0].ID, music.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = catRepo.AddCategoryToPost(expectedPosts[0].ID, Puters.ID)
+	err = repo.AddCategoryToPost(expectedPosts[0].ID, Puters.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = catRepo.AddCategoryToPost(expectedPosts[1].ID, cooking.ID)
+	err = repo.AddCategoryToPost(expectedPosts[1].ID, cooking.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = catRepo.AddCategoryToPost(expectedPosts[1].ID, Puters.ID)
+	err = repo.AddCategoryToPost(expectedPosts[2].ID, cooking.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = catRepo.AddCategoryToPost(expectedPosts[2].ID, cooking.ID)
+	expected := []models.Category{cooking, music, Puters}
+	got, err := repo.GetCategoriesByPostID(expectedPosts[0].ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(got, expected) {
+		t.Logf("categories array mismatch, want %v, got %v", got, expected)
+		t.Fail()
+	}
+}
+
+func TestFilterByMultipleCategories(t *testing.T) {
+	data, err := db.Database("./test.db")
+	defer RemoveDB()
+	if err != nil {
+		t.Fatal(err)
+	}
+	repo := repository.NewRepository(data)
+	id, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+	user := models.User{
+		ID: models.UserID(id),
+	}
+	err = repo.CreateUser(user)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cooking := models.Category{
+		ID:   models.CategoryID(1),
+		Name: "Cooking",
+	}
+	music := models.Category{
+		ID:   models.CategoryID(2),
+		Name: "Music",
+	}
+	Puters := models.Category{
+		ID:   models.CategoryID(3),
+		Name: "Puters",
+	}
+	err = repo.CreateCategory(cooking.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = repo.CreateCategory(music.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = repo.CreateCategory(Puters.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedPosts := []models.Post{
+		{
+			ID:        models.PostID(1),
+			Title:     "title",
+			Content:   "content",
+			Author:    models.User{ID: user.ID},
+			CreatedAt: time.Now().Truncate(time.Second),
+		},
+		{
+			ID:        models.PostID(2),
+			Title:     "title2",
+			Content:   "content2",
+			Author:    models.User{ID: user.ID},
+			CreatedAt: time.Now().Truncate(time.Second),
+		},
+		{
+			ID:        models.PostID(3),
+			Title:     "title3",
+			Content:   "content3",
+			Author:    models.User{ID: user.ID},
+			CreatedAt: time.Now().Truncate(time.Second),
+		},
+		{
+			ID:        models.PostID(4),
+			Title:     "title4",
+			Content:   "content4",
+			Author:    models.User{ID: user.ID},
+			CreatedAt: time.Now().Truncate(time.Second),
+		},
+	}
+	for i := range expectedPosts {
+		_, err = repo.CreatePost(expectedPosts[i])
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	err = repo.AddCategoryToPost(expectedPosts[0].ID, cooking.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = repo.AddCategoryToPost(expectedPosts[0].ID, music.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = repo.AddCategoryToPost(expectedPosts[0].ID, Puters.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = repo.AddCategoryToPost(expectedPosts[1].ID, cooking.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = repo.AddCategoryToPost(expectedPosts[1].ID, Puters.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = repo.AddCategoryToPost(expectedPosts[2].ID, cooking.ID)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -2,62 +2,86 @@ package service
 
 import (
 	"forumv2/internal/models"
-	"forumv2/internal/repository"
+	"time"
 )
 
-type Service struct {
+type service struct {
+	*userService
+	*postService
+	*sessionService
+	*commentService
+	*reactionsService
+}
+
+type Repository interface {
 	User
 	Post
 	Session
 	Comments
 	Reactions
+	Categories
+}
+
+func NewService(repo Repository) *service {
+	return &service{
+		newUserService(repo),
+		newPostService(repo, repo, repo),
+		newSessionService(repo),
+		newCommentsService(repo),
+		newReactionsService(repo, repo, repo),
+	}
 }
 
 type User interface {
-	CreateSessionService(user models.User) (string, error)
-	CreateUserService(user models.User) (int, error)
-	AuthorizationUserService(models.User) (string, error)
-	GetUserInfoService(user models.User) (models.User, error)
-	GetUsersInfoByUUIDService(id models.UserID) (models.User, error)
+	SetSession(user models.User, token string, time time.Time) error
+	CreateUser(user models.User) error
+	GetUserInfoByEmail(email string) (models.User, error)
+	GetUsersInfoByUUID(id models.UserID) (models.User, error) //++
 	CheckUserEmail(email string) (bool, error)
 	CheckUserUsername(username string) (bool, error)
 }
 
 type Post interface {
-	CreatePostService(post models.Post) (models.PostID, error)
-	GetAllPostService() ([]models.Post, error)
-	GetUsersPostInService(uuid models.UserID) ([]models.Post, error)
-	GetUsersLikedPosts(id models.UserID) ([]models.Post, error)
-	GetPostByIDinService(id models.PostID) (models.Post, error)
-	FilterPostsByCategories([]string) ([]models.Post, error)
-	CreateCategory(string) error
-	GetCategoryByName(string) (models.Category, error)
-	CheckPostInput(models.Post) error
+	CreatePost(post models.Post) (models.PostID, error)
+	GetAllPost() ([]models.Post, error)
+	GetPostByID(id models.PostID) (models.Post, error)
+	GetPostsByUserID(uuid models.UserID) ([]models.Post, error)
+	GetUsersLikePosts(id models.UserID) ([]models.Post, error)
+	FilterPostsByMultipleCategories(categories []models.Category) ([]models.Post, error)
+	UpdatePost(models.Post) error
 }
 
 type Session interface {
-	DeleteSessionService(id models.UserID) error
-	GetSessionService(token string) (models.UserID, error)
+	GetSessionFromDB(token string) (models.UserID, error)
+	DeleteSessionFromDB(models.UserID) error
 }
 
 type Comments interface {
-	GetAllCommentsInService() ([]models.Comment, error)
-	GetCommentsByIDinService(postID models.PostID) ([]models.Comment, error)
-	CreateCommentsInService(com models.Comment) error
-	CheckCommentInput(models.Comment) error
+	CreateComment(models.Comment) error
+	GetCommentsByPostID(postID models.PostID) ([]models.Comment, error)
+	GetCommentByCommentID(commentID int) (models.Comment, error)
+	UpdateComment(models.Comment) error
 }
 
 type Reactions interface {
-	LikePostService(like models.LikePost) error
-	LikeCommentService(like models.LikeComment) error
+	CreateLikeForPost(like models.LikePost) (models.LikePost, error)
+	CreateLikeForComment(like models.LikeComment) (models.LikeComment, error)
+
+	GetUserIDfromLikePost(like models.LikePost) (models.PostID, error)
+	GetLikeStatusByPostAndUserID(like models.LikePost) (models.LikeStatus, error)
+	GetLikeStatusByCommentAndUserID(like models.LikeComment) (models.LikeStatus, error)
+
+	UpdatePostLikeStatus(like models.LikePost) error
+	UpdateCommentLikeStatus(like models.LikeComment) error
+
+	DeletePostLike(models.LikePost) error
+	DeleteCommentLike(models.LikeComment) error
 }
 
-func NewService(repo repository.Repository) Service {
-	return Service{
-		User:      NewUserService(repo.User),
-		Post:      NewPostService(repo.Post, repo.User, repo.Categories),
-		Session:   NewSessionService(repo.Session),
-		Comments:  NewCommentsService(repo.Comments),
-		Reactions: NewReactionsService(repo.Reactions, repo.Post, repo.Comments),
-	}
+type Categories interface {
+	CreateCategory(string) error
+	AddCategoryToPost(models.PostID, models.CategoryID) error
+	GetCategoryByName(string) (models.Category, error)
+	GetCategoriesByPostID(models.PostID) ([]models.Category, error)
+	GetPostsByCategory(category models.Category) ([]models.Post, error)
 }

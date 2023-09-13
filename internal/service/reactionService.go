@@ -2,24 +2,23 @@ package service
 
 import (
 	"forumv2/internal/models"
-	"forumv2/internal/repository"
 )
 
-type ReactionsService struct {
-	repo        repository.Reactions
-	postRepo    repository.Post
-	commentRepo repository.Comments
+type reactionsService struct {
+	repo        Reactions
+	postRepo    Post
+	commentRepo Comments
 }
 
-func NewReactionsService(repo repository.Reactions, postRepo repository.Post, commentRepo repository.Comments) *ReactionsService {
-	return &ReactionsService{
+func newReactionsService(repo Reactions, postRepo Post, commentRepo Comments) *reactionsService {
+	return &reactionsService{
 		repo:        repo,
 		postRepo:    postRepo,
 		commentRepo: commentRepo,
 	}
 }
 
-func (r *ReactionsService) LikePostService(like models.LikePost) error {
+func (r *reactionsService) LikePostService(like models.LikePost) error {
 	status, err := r.repo.GetLikeStatusByPostAndUserID(like)
 	if err != nil {
 		return err
@@ -70,7 +69,7 @@ func (r *ReactionsService) LikePostService(like models.LikePost) error {
 	return nil
 }
 
-func (r *ReactionsService) LikeCommentService(like models.LikeComment) error {
+func (r *reactionsService) LikeCommentService(like models.LikeComment) error {
 	status, err := r.repo.GetLikeStatusByCommentAndUserID(like)
 	if err != nil {
 		return err

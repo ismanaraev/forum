@@ -3,21 +3,20 @@ package service
 import (
 	"errors"
 	"forumv2/internal/models"
-	"forumv2/internal/repository"
 	"strings"
 )
 
-type CommentService struct {
-	repo repository.Comments
+type commentService struct {
+	repo Repository
 }
 
-func NewCommentsService(repo repository.Comments) *CommentService {
-	return &CommentService{
+func newCommentsService(repo Repository) *commentService {
+	return &commentService{
 		repo: repo,
 	}
 }
 
-func (c *CommentService) CheckCommentInput(comment models.Comment) error {
+func (c *commentService) CheckCommentInput(comment models.Comment) error {
 	if comment := strings.Trim(comment.Content, "\r\n "); len(comment) == 0 {
 		return errors.New("empty title")
 	}
@@ -30,14 +29,20 @@ func (c *CommentService) CheckCommentInput(comment models.Comment) error {
 	return nil
 }
 
-func (c *CommentService) GetAllCommentsInService() ([]models.Comment, error) {
-	return c.repo.GetAllComments()
+func (c *commentService) GetCommentsByPostID(postID models.PostID) ([]models.Comment, error) {
+	comments, err := c.repo.GetCommentsByPostID(postID)
+	if err != nil {
+		return nil, err
+	}
+	for i := range comments {
+		comments[i].Author, err = c.repo.GetUsersInfoByUUID(comments[i].Author.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return comments, nil
 }
 
-func (c *CommentService) GetCommentsByIDinService(postID models.PostID) ([]models.Comment, error) {
-	return c.repo.GetCommentsByID(postID)
-}
-
-func (c *CommentService) CreateCommentsInService(com models.Comment) error {
-	return c.repo.CreateComments(com)
+func (c *commentService) CreateComment(com models.Comment) error {
+	return c.repo.CreateComment(com)
 }

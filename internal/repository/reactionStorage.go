@@ -6,17 +6,17 @@ import (
 	"forumv2/internal/models"
 )
 
-type ReactionsStorage struct {
+type reactionsStorage struct {
 	db *sql.DB
 }
 
-func NewReactionsSQLite(db *sql.DB) *ReactionsStorage {
-	return &ReactionsStorage{
+func newReactionsSQLite(db *sql.DB) *reactionsStorage {
+	return &reactionsStorage{
 		db: db,
 	}
 }
 
-func (r *ReactionsStorage) CreateLikeForPost(like models.LikePost) (models.LikePost, error) {
+func (r *reactionsStorage) CreateLikeForPost(like models.LikePost) (models.LikePost, error) {
 	queryForLike, err := r.db.Prepare(`INSERT INTO likePost(userID,postID, status) VALUES ($1,$2,$3)`)
 	if err != nil {
 		return like, fmt.Errorf("[ReactionStorage]:Error with CreateLikeForPost method in repository: %w", err)
@@ -28,7 +28,7 @@ func (r *ReactionsStorage) CreateLikeForPost(like models.LikePost) (models.LikeP
 	return like, nil
 }
 
-func (r *ReactionsStorage) CreateLikeForComment(like models.LikeComment) (models.LikeComment, error) {
+func (r *reactionsStorage) CreateLikeForComment(like models.LikeComment) (models.LikeComment, error) {
 	queryForLike, err := r.db.Prepare(`INSERT INTO likeComments(userID, commentsID, status) VALUES ($1,$2,$3)`)
 	if err != nil {
 		return like, fmt.Errorf("[ReactionStorage]:Error with CreateLikeForComment method in repository: %w", err)
@@ -40,7 +40,7 @@ func (r *ReactionsStorage) CreateLikeForComment(like models.LikeComment) (models
 	return like, nil
 }
 
-func (r *ReactionsStorage) UpdatePostLikeStatus(like models.LikePost) error {
+func (r *reactionsStorage) UpdatePostLikeStatus(like models.LikePost) error {
 	records := ("UPDATE likePost SET status = $1 WHERE postID = $2")
 	query, err := r.db.Prepare(records)
 	if err != nil {
@@ -53,7 +53,7 @@ func (r *ReactionsStorage) UpdatePostLikeStatus(like models.LikePost) error {
 	return nil
 }
 
-func (r *ReactionsStorage) UpdateCommentLikeStatus(like models.LikeComment) error {
+func (r *reactionsStorage) UpdateCommentLikeStatus(like models.LikeComment) error {
 	records := ("UPDATE likeComments SET status = $1 WHERE commentsID = $2")
 	query, err := r.db.Prepare(records)
 	if err != nil {
@@ -66,7 +66,7 @@ func (r *ReactionsStorage) UpdateCommentLikeStatus(like models.LikeComment) erro
 	return nil
 }
 
-func (r *ReactionsStorage) GetUserIDfromLikePost(like models.LikePost) (models.PostID, error) {
+func (r *reactionsStorage) GetUserIDfromLikePost(like models.LikePost) (models.PostID, error) {
 	row := r.db.QueryRow("SELECT postID FROM likePost WHERE userID=$1", like.UserID)
 	temp := models.LikePost{}
 	err := row.Scan(&temp.PostID)
@@ -76,7 +76,7 @@ func (r *ReactionsStorage) GetUserIDfromLikePost(like models.LikePost) (models.P
 	return temp.PostID, nil
 }
 
-func (r *ReactionsStorage) GetLikeStatusByPostAndUserID(like models.LikePost) (models.LikeStatus, error) {
+func (r *reactionsStorage) GetLikeStatusByPostAndUserID(like models.LikePost) (models.LikeStatus, error) {
 	stmt := `SELECT status FROM likePost WHERE userID == $1 AND postID == $2`
 	query, err := r.db.Prepare(stmt)
 	if err != nil {
@@ -95,7 +95,7 @@ func (r *ReactionsStorage) GetLikeStatusByPostAndUserID(like models.LikePost) (m
 	return status, nil
 }
 
-func (r *ReactionsStorage) GetLikeStatusByCommentAndUserID(like models.LikeComment) (models.LikeStatus, error) {
+func (r *reactionsStorage) GetLikeStatusByCommentAndUserID(like models.LikeComment) (models.LikeStatus, error) {
 	stmt := `SELECT status FROM likeComments WHERE userID == $1 AND commentsID == $2`
 	query, err := r.db.Prepare(stmt)
 	if err != nil {
@@ -113,7 +113,7 @@ func (r *ReactionsStorage) GetLikeStatusByCommentAndUserID(like models.LikeComme
 	return status, nil
 }
 
-func (r *ReactionsStorage) DeleteCommentLike(like models.LikeComment) error {
+func (r *reactionsStorage) DeleteCommentLike(like models.LikeComment) error {
 	stmt := `DELETE FROM likeComments WHERE commentsID == $1 AND userID == $2`
 	query, err := r.db.Prepare(stmt)
 	if err != nil {
@@ -126,7 +126,7 @@ func (r *ReactionsStorage) DeleteCommentLike(like models.LikeComment) error {
 	return nil
 }
 
-func (r *ReactionsStorage) DeletePostLike(like models.LikePost) error {
+func (r *reactionsStorage) DeletePostLike(like models.LikePost) error {
 	stmt := `DELETE FROM likePost WHERE postID == $1 AND userID == $2`
 	query, err := r.db.Prepare(stmt)
 	if err != nil {

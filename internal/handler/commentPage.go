@@ -39,23 +39,20 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t := time.Now()
-	timeFormat := t.Format("15:04:04,02 January 2006")
-
 	comm := models.Comment{
 		PostID:    models.PostID(postID),
-		Author:    user.Username,
+		Author:    user,
 		Content:   content,
 		Like:      0,
 		Dislike:   0,
-		CreatedAt: timeFormat,
+		CreatedAt: time.Now(),
 	}
 	err = h.service.CheckCommentInput(comm)
 	if err != nil {
 		errorHeader(w, "comment is invalid", http.StatusBadRequest)
 		return
 	}
-	err = h.service.CreateCommentsInService(comm)
+	err = h.service.CreateComment(comm)
 	if err != nil {
 		errorHeader(w, "comment is not created", http.StatusInternalServerError)
 		return

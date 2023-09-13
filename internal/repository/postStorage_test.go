@@ -24,8 +24,7 @@ func TestCreatePost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	repo := repository.NewPostSQLite(data)
-	userRepo := repository.NewUserSQLite(data)
+	repo := repository.NewRepository(data)
 	id, err := uuid.NewV4()
 	if err != nil {
 		t.Fatal(err)
@@ -37,7 +36,7 @@ func TestCreatePost(t *testing.T) {
 		Email:    "asdf@asdf.com",
 		Password: "asdfasdf",
 	}
-	_, err = userRepo.CreateUser(user)
+	err = repo.CreateUser(user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -65,7 +64,7 @@ func TestCreatePost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	gotUser, err := userRepo.GetUsersInfoByUUID(uuid)
+	gotUser, err := repo.GetUsersInfoByUUID(uuid)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,8 +81,7 @@ func TestGetAllPosts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	repo := repository.NewPostSQLite(data)
-	userRepo := repository.NewUserSQLite(data)
+	repo := repository.NewRepository(data)
 	id, err := uuid.NewV4()
 	if err != nil {
 		t.Fatal(err)
@@ -91,7 +89,7 @@ func TestGetAllPosts(t *testing.T) {
 	user := models.User{
 		ID: models.UserID(id),
 	}
-	_, err = userRepo.CreateUser(user)
+	err = repo.CreateUser(user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -149,8 +147,7 @@ func TestGetPostByID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	repo := repository.NewPostSQLite(data)
-	userRepo := repository.NewUserSQLite(data)
+	repo := repository.NewRepository(data)
 	id, err := uuid.NewV4()
 	if err != nil {
 		t.Fatal(err)
@@ -158,7 +155,7 @@ func TestGetPostByID(t *testing.T) {
 	user := models.User{
 		ID: models.UserID(id),
 	}
-	_, err = userRepo.CreateUser(user)
+	err = repo.CreateUser(user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -216,8 +213,7 @@ func TestGetPostsByUserID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	repo := repository.NewPostSQLite(data)
-	userRepo := repository.NewUserSQLite(data)
+	repo := repository.NewRepository(data)
 	id, err := uuid.NewV4()
 	if err != nil {
 		t.Fatal(err)
@@ -225,7 +221,7 @@ func TestGetPostsByUserID(t *testing.T) {
 	userA := models.User{
 		ID: models.UserID(id),
 	}
-	_, err = userRepo.CreateUser(userA)
+	err = repo.CreateUser(userA)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -275,7 +271,7 @@ func TestGetPostsByUserID(t *testing.T) {
 		Username: "user",
 		Email:    "email",
 	}
-	_, err = userRepo.CreateUser(userB)
+	err = repo.CreateUser(userB)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -336,9 +332,7 @@ func TestGetUserLikedPosts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	repo := repository.NewPostSQLite(data)
-	userRepo := repository.NewUserSQLite(data)
-	reactionRepo := repository.NewReactionsSQLite(data)
+	repo := repository.NewRepository(data)
 	id, err := uuid.NewV4()
 	if err != nil {
 		t.Fatal(err)
@@ -346,7 +340,7 @@ func TestGetUserLikedPosts(t *testing.T) {
 	user := models.User{
 		ID: models.UserID(id),
 	}
-	_, err = userRepo.CreateUser(user)
+	err = repo.CreateUser(user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -405,7 +399,7 @@ func TestGetUserLikedPosts(t *testing.T) {
 	}
 	expected := []models.Post{expectedPosts[0], expectedPosts[2]}
 	for i := range likes {
-		_, err = reactionRepo.CreateLikeForPost(likes[i])
+		_, err = repo.CreateLikeForPost(likes[i])
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -431,8 +425,7 @@ func TestUpdatePost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	repo := repository.NewPostSQLite(data)
-	userRepo := repository.NewUserSQLite(data)
+	repo := repository.NewRepository(data)
 	id, err := uuid.NewV4()
 	if err != nil {
 		t.Fatal(err)
@@ -444,7 +437,7 @@ func TestUpdatePost(t *testing.T) {
 		Email:    "asdf@asdf.com",
 		Password: "asdfasdf",
 	}
-	_, err = userRepo.CreateUser(user)
+	err = repo.CreateUser(user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -486,9 +479,7 @@ func TestGetPostsByCategory(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	repo := repository.NewPostSQLite(data)
-	userRepo := repository.NewUserSQLite(data)
-	catRepo := repository.NewCategoriesStorage(data)
+	repo := repository.NewRepository(data)
 	id, err := uuid.NewV4()
 	if err != nil {
 		t.Fatal(err)
@@ -496,7 +487,7 @@ func TestGetPostsByCategory(t *testing.T) {
 	user := models.User{
 		ID: models.UserID(id),
 	}
-	_, err = userRepo.CreateUser(user)
+	err = repo.CreateUser(user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -508,11 +499,11 @@ func TestGetPostsByCategory(t *testing.T) {
 		ID:   models.CategoryID(2),
 		Name: "Second",
 	}
-	err = catRepo.CreateCategory("Cooking")
+	err = repo.CreateCategory("Cooking")
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = catRepo.CreateCategory("Second")
+	err = repo.CreateCategory("Second")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -553,7 +544,7 @@ func TestGetPostsByCategory(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = catRepo.AddCategoryToPost(val.ID, cooking.ID)
+		err = repo.AddCategoryToPost(val.ID, cooking.ID)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -563,12 +554,12 @@ func TestGetPostsByCategory(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = catRepo.AddCategoryToPost(val.ID, second.ID)
+		err = repo.AddCategoryToPost(val.ID, second.ID)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
-	cookingPosts, err := catRepo.GetPostsByCategory(cooking)
+	cookingPosts, err := repo.GetPostsByCategory(cooking)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -581,7 +572,7 @@ func TestGetPostsByCategory(t *testing.T) {
 			t.Fail()
 		}
 	}
-	secondPosts, err := catRepo.GetPostsByCategory(second)
+	secondPosts, err := repo.GetPostsByCategory(second)
 	if err != nil {
 		t.Fatal(err)
 	}

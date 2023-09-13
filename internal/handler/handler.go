@@ -6,16 +6,15 @@ import (
 	"os"
 
 	"forumv2"
-	"forumv2/internal/service"
 )
 
 type Handler struct {
-	service *service.Service
+	service Service
 }
 
-func NewHandler(service service.Service) *Handler {
+func NewHandler(service Service) *Handler {
 	return &Handler{
-		service: &service,
+		service: service,
 	}
 }
 

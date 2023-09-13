@@ -5,20 +5,21 @@ import (
 	"fmt"
 	"forumv2/internal/models"
 	"log"
+	"strconv"
 	"time"
 )
 
-type PostStorage struct {
+type postStorage struct {
 	db *sql.DB
 }
 
-func NewPostSQLite(db *sql.DB) *PostStorage {
-	return &PostStorage{
+func newPostSQLite(db *sql.DB) *postStorage {
+	return &postStorage{
 		db: db,
 	}
 }
 
-func (p *PostStorage) CreatePost(post models.Post) (models.PostID, error) {
+func (p *postStorage) CreatePost(post models.Post) (models.PostID, error) {
 	query, err := p.db.Prepare(`INSERT INTO post(title,content,author,createdat) VALUES ($1,$2,$3,$4)`)
 	if err != nil {
 		return 0, fmt.Errorf("[PostStorage]:Error with CreatePost method in repository: %w", err)
@@ -40,7 +41,7 @@ func (p *PostStorage) CreatePost(post models.Post) (models.PostID, error) {
 }
 
 // Запрос на все посты
-func (p *PostStorage) GetAllPost() ([]models.Post, error) {
+func (p *postStorage) GetAllPost() ([]models.Post, error) {
 	row, err := p.db.Query("SELECT ID,title,content,author,createdAt FROM post")
 	if err != nil {
 		return nil, fmt.Errorf("[PostStorage]:Error with GetAllPost method in repository: %w", err)
@@ -67,7 +68,7 @@ func (p *PostStorage) GetAllPost() ([]models.Post, error) {
 	return allPost, nil
 }
 
-func (p *PostStorage) GetPostByID(id models.PostID) (models.Post, error) {
+func (p *postStorage) GetPostByID(id models.PostID) (models.Post, error) {
 	row := p.db.QueryRow("SELECT ID,title,content,author,createdAt,like, dislike FROM post WHERE ID=$1", id)
 
 	var temp models.Post
@@ -85,7 +86,7 @@ func (p *PostStorage) GetPostByID(id models.PostID) (models.Post, error) {
 	return temp, nil
 }
 
-func (p *PostStorage) GetPostsByUserID(uuid models.UserID) ([]models.Post, error) {
+func (p *postStorage) GetPostsByUserID(uuid models.UserID) ([]models.Post, error) {
 	row, err := p.db.Query("SELECT ID,title,content,createdAt,like,dislike FROM post WHERE author=$1", uuid.String())
 	if err != nil {
 		return nil, fmt.Errorf("[PostStorage]:Error with GetUsersPost method in repository: %w", err)
@@ -107,7 +108,7 @@ func (p *PostStorage) GetPostsByUserID(uuid models.UserID) ([]models.Post, error
 	return usersPost, nil
 }
 
-func (p *PostStorage) GetUsersLikePosts(id models.UserID) ([]models.Post, error) {
+func (p *postStorage) GetUsersLikePosts(id models.UserID) ([]models.Post, error) {
 	result := []models.Post{}
 
 	rows, err := p.db.Query("SELECT ID,title,content,author,createdAt,like,dislike FROM post WHERE ID IN (SELECT postID FROM likePost WHERE userID = $1 AND status = $2)", id.String(), models.Like)
@@ -134,7 +135,7 @@ func (p *PostStorage) GetUsersLikePosts(id models.UserID) ([]models.Post, error)
 	return result, nil
 }
 
-func (p *PostStorage) UpdatePost(post models.Post) error {
+func (p *postStorage) UpdatePost(post models.Post) error {
 	stmt := `UPDATE post SET ID=$1,title=$2,content=$3,author=$4,createdat=$5,like=$6,dislike=$7 WHERE ID == $1`
 	query, err := p.db.Prepare(stmt)
 	if err != nil {
@@ -147,29 +148,42 @@ func (p *PostStorage) UpdatePost(post models.Post) error {
 	return nil
 }
 
-func (c *CategoriesStorage) GetPostsByCategory(category models.Category) ([]models.Post, error) {
-	stmt := `SELECT ID, title, content, author, createdat, like, dislike FROM post WHERE id IN (SELECT postID FROM categoriesPost WHERE categoryID = $1)`
-	query, err := c.db.Prepare(stmt)
+func (p *postStorage) FilterPostsByMultipleCategories(categories []models.Category) ([]models.Post, error) {
+	if len(categories) == 0 {
+		return nil, nil
+	}
+	var s string
+	for i := 1; i < len(categories); i++ {
+		s += fmt.Sprintf(",$%d", i+1)
+	}
+	var ids []interface{}
+	for _, val := range categories {
+		ids = append(ids, val.ID)
+	}
+	stmt, err := p.db.Prepare(`SELECT postID FROM categoriesPost WHERE categoryID IN ($1` + s + ")" + "GROUP BY postID HAVING count() = $" + strconv.Itoa(len(categories)+2))
 	if err != nil {
 		return nil, err
 	}
-	var res []models.Post
-	values, err := query.Query(category.ID)
+	ids = append(ids, len(categories))
+	rows, err := stmt.Query(ids...)
 	if err != nil {
 		return nil, err
 	}
-	for values.Next() {
-		var post models.Post
-		var userIdStr string
-		var timestamp int64
-		if err = values.Scan(&post.ID, &post.Title, &post.Content, &userIdStr, &timestamp, &post.Like, &post.Dislike); err != nil {
-			return nil, err
-		}
-		post.Author.ID, err = models.UserIDFromString(userIdStr)
+	var postIDS []int64
+	for rows.Next() {
+		var temp int64
+		err = rows.Scan(&temp)
 		if err != nil {
 			return nil, err
 		}
-		post.CreatedAt = time.Unix(timestamp, 0)
+		postIDS = append(postIDS, temp)
+	}
+	var res []models.Post
+	for _, val := range postIDS {
+		post, err := p.GetPostByID(models.PostID(val))
+		if err != nil {
+			return nil, err
+		}
 		res = append(res, post)
 	}
 	return res, nil
