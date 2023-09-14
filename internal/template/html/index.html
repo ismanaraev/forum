@@ -13,30 +13,17 @@
     <title>homepage</title>
 </head>
 <body> 
-    <nav>   
-        <label class="logo">The Forum</label>
-        
-        {{ if .Data.Username  }}
-        <ul>
-            <li> <a href="/myprofile">{{.Data.Username  }}</a></li> 
-            <li> <a href="/create-post">Create Post</a></li>
-            <li> <a href="/logout">Log Out</a></li>
-        </ul>
-    {{ else }}
-    <ul>
-        <li> <a href="/sign-up">Sign Up</a></li>
-        <li> <a href="/sign-in">Sign In</a></li>
-    </ul> 
-  </nav>
-    {{ end }}
+    {{template "header" .}}
 <br>
 <div>
+    {{if .Categories}}
     <form class="form" action="/filter" method="get">
 	{{ range .Categories }}
 	    <div class="category"><input name="category" type="checkbox" value="{{.Name}}">{{.Name}} </div>
 	{{end}}
     <button type="submit" class="btn">Search</button>
     </form>
+    {{end}}
 </div>
 <form class="form" action="/create-category" method="post">
 	<input name="name" required></input>

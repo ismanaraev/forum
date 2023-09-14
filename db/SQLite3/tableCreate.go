@@ -63,6 +63,12 @@ var tables []string = []string{
 		FOREIGN KEY (categoryID) REFERENCES categories(ID) ON DELETE CASCADE,
 		FOREIGN KEY (postID) REFERENCES post(ID) ON DELETE CASCADE
 		);`,
+	`CREATE TABLE IF NOT EXISTS picture(
+		ID INTEGER PRIMARY KEY AUTOINCREMENT,
+		value STRING NOT NULL,
+		postID INTEGER NOT NULL,
+		FOREIGN KEY (postID) REFERENCES post(ID) ON DELETE CASCADE
+		);`,
 }
 
 // Создание таблицы пользователя

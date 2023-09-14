@@ -11,6 +11,7 @@ type repository struct {
 	*commentStorage
 	*reactionsStorage
 	*categoriesStorage
+	*pictureStorage
 }
 
 func NewRepository(db *sql.DB) *repository {
@@ -21,5 +22,6 @@ func NewRepository(db *sql.DB) *repository {
 		newCommentsSQLite(db),
 		newReactionsSQLite(db),
 		newCategoriesStorage(db),
+		newPictureStorage(db),
 	}
 }

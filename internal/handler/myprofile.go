@@ -8,7 +8,7 @@ import (
 )
 
 type Data struct {
-	Userinfo models.User
+	Data     models.User
 	Post     []models.Post
 	LikePost []models.Post
 }
@@ -19,7 +19,7 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	html, err := template.ParseFiles(TemplateDir + "html/myprofile.html")
+	html, err := template.ParseFiles(TemplateDir+"html/myprofile.html", TemplateDir+"html/header.html")
 	if err != nil {
 		errorHeader(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -30,7 +30,6 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-
 		userInfo, err := h.service.GetUsersInfoByUUIDService(id)
 		if err != nil {
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -51,12 +50,12 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data := &Data{
-			Userinfo: userInfo,
+			Data:     userInfo,
 			Post:     usersPost,
 			LikePost: userLikePosts,
 		}
 
-		err = html.Execute(w, &data)
+		err = html.Execute(w, data)
 		if err != nil {
 			log.Print(err)
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"database/sql"
+	"encoding/base64"
 	"errors"
 	"forumv2/internal/models"
 	"strings"
@@ -49,6 +51,11 @@ func (p *postService) CreatePostService(post models.Post) (models.PostID, error)
 			return 0, err
 		}
 	}
+	temp := base64.StdEncoding.EncodeToString(post.Pictures.Value)
+	err = p.repo.AddPictureToPost(postId, models.Picture{Value: []byte(temp)})
+	if err != nil {
+		return 0, err
+	}
 	return postId, nil
 }
 
@@ -67,6 +74,12 @@ func (p *postService) GetAllPostService() ([]models.Post, error) {
 			return nil, err
 		}
 		posts[i].Categories = categories
+		posts[i].Pictures, err = p.repo.GetPictureByPostID(posts[i].ID)
+		if err != nil {
+			if !errors.Is(err, sql.ErrNoRows) {
+				return nil, err
+			}
+		}
 	}
 	return posts, nil
 }
@@ -84,8 +97,13 @@ func (p *postService) GetPostByIDinService(id models.PostID) (models.Post, error
 	if err != nil {
 		return models.Post{}, err
 	}
+	picture, err := p.repo.GetPictureByPostID(id)
+	if err != nil {
+		return models.Post{}, err
+	}
 	post.Author = author
 	post.Categories = categories
+	post.Pictures = picture
 	return post, nil
 }
 
@@ -116,7 +134,7 @@ func (p *postService) FilterPostsByCategories(categoriesString []string) ([]mode
 		if err != nil {
 			return nil, err
 		}
-		categories = append(categories, temp)
+		categories = append(categories, *temp)
 	}
 	posts, err := p.repo.FilterPostsByMultipleCategories(categories)
 	if err != nil {
@@ -138,7 +156,8 @@ func (p *postService) FilterPostsByCategories(categoriesString []string) ([]mode
 }
 
 func (p *postService) GetCategoryByName(name string) (models.Category, error) {
-	return p.repo.GetCategoryByName(name)
+	res, err := p.repo.GetCategoryByName(name)
+	return *res, err
 }
 
 func (p *postService) GetUsersLikedPosts(id models.UserID) ([]models.Post, error) {

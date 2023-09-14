@@ -11,15 +11,8 @@
     <title>My Profile Page</title>
 </head>
 <body>
-    <nav>   
-        <label class="logo">The Forum</label>
-        <ul>
-            <li> <a href="/">Homepage</a></li> 
-            <li> <a href="/create-post">Create Post</a></li>
-            <li> <a href="/logout">Log Out</a></li>
-        </ul>
-  </nav>
-  <h1>Hi, {{.Userinfo.Username}}!</h1>
+    {{template "header" .}}
+  <h1>Hi, {{.Data.Username}}!</h1>
   <h2>My Posts:</h2>
   <div class="post">
   {{ range .Post }}

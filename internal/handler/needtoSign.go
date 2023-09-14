@@ -17,14 +17,14 @@ func (h *Handler) needToSign(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	html, err := template.ParseFiles(TemplateDir + "html/needtoSign.html")
+	html, err := template.ParseFiles(TemplateDir+"html/needtoSign.html", TemplateDir+"html/header.html")
 	if err != nil {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	// w.WriteHeader(http.StatusBadRequest)
-	err = html.Execute(w, "")
+	err = html.Execute(w, nil)
 	if err != nil {
 		log.Print(err)
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

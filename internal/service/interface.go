@@ -21,6 +21,7 @@ type Repository interface {
 	Comments
 	Reactions
 	Categories
+	Pictures
 }
 
 func NewService(repo Repository) *service {
@@ -83,9 +84,14 @@ type Reactions interface {
 type Categories interface {
 	CreateCategory(string) error
 	AddCategoryToPost(models.PostID, models.CategoryID) error
-	GetCategoryByName(string) (models.Category, error)
+	GetCategoryByName(string) (*models.Category, error)
 	GetCategoriesByPostID(models.PostID) ([]models.Category, error)
 	GetPostsByCategory(category models.Category) ([]models.Post, error)
 	DeleteCategory(name string) error
 	GetAllCategories() ([]models.Category, error)
+}
+
+type Pictures interface {
+	AddPictureToPost(id models.PostID, pic models.Picture) error
+	GetPictureByPostID(id models.PostID) (models.Picture, error)
 }

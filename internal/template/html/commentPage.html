@@ -11,48 +11,42 @@
     <title>Comments</title>
 </head>
 <body>
-    <nav>   
-        <label class="logo">The Forum</label>
-        <ul>
-        {{ if .User.Username  }}
-        <ul>
-            <li> <a href="/myprofile">{{.User.Username  }}</a></li> 
-            <li> <a href="/create-post">Create Post</a></li>
-            <li> <a href="/logout">Log Out</a></li>
-        </ul>
-        {{ else }}
-        <ul>
-            <li><a href="/">Homepage</a></li>
-            <li> <a href="/sign-up">Sign Up</a></li>
-            <li> <a href="/sign-in">Sign In</a></li>
-        </ul> 
-        {{ end }}
-        </ul>
-  </nav>
-
+    {{template "header" .}}
         <fieldset class="field">
-            <legend>{{ .Post.Author.Name }}</legend>
-            <div class="content-limit">
-             <h3>{{ .Post.Title }}</h3>
-             <div class="comment-content">
-                    {{  .Post.Content }}
-                    </div>
-                <br><br>
-                <p>Category:{{ range .Post.Categories }}{{.Name}}{{end}}</p> 
+            <div class="canvas">
+            {{range .Post}}
+            <legend>{{ .Author.Name }}</legend>
+             <h3>{{ .Title }}</h3>
+                    {{  .Content }}
+                <br>
+                <img src="data:image/jpeg;base64, {{ .Pictures }}">
+                <p>Category:{{ range .Categories }}{{.Name}}{{end}}</p> 
                 <div class="reactions">
                 <form action="/like-post" method="POST">
-                    <input type="hidden" name="postID" value="{{.Post.ID}}">
+                    <input type="hidden" name="postID" value="{{.ID}}">
                     <button class="btn-like" name="status" type="submit" value="1">Like</button>
-                    <p class="like-count">{{.Post.Like}}</p>
+                    <p class="like-count">{{.Like}}</p>
                     <button class="btn-dislike" name="status" type="submit" value="-1">Dislike</button>
-                    <p class="dislike-count">{{.Post.Dislike}}</p>
+                    <p class="dislike-count">{{.Dislike}}</p>
                 </form>
                 </div>
+                <div class="create-comment">
+                    <form action="/create-comment" method="POST">
+                    <input type="hidden" value="{{.ID}}" name="postID">
+                    <textarea class="comments-class" type="txt" name="content"></textarea>
+                    <br>
+                    <button class="btn-comments" type="submit">Upload</button>
+                    <br>
+                    </form>
+                    </div>
+               {{ end }}
 
+               <form >
+                <input type="file">
+               </form>
                 </div>
                 <p class="comments-h">Comments:</p>
-
-                 {{ range .Comment }}
+                 {{ range .Comments }}
                  <div class="comment-field">
                     <fieldset>   
                         <div class="content-limit">
@@ -69,20 +63,13 @@
 			    <input type="hidden" name="commentID" value={{.ID}}>
                 <input type="hidden" name="postID" value="{{.PostID}}">
 		    </form>
-
-                {{ end }}
+            {{end}}
+        </div>
          
         </fieldset>
     
-            <div class="create-comment">
-             <form action="/create-comment" method="POST">
-             <input type="hidden" value="{{.Post.ID}}" name="postID">
-             <textarea class="comments-class" type="txt" name="content"></textarea>
-             <br>
-             <button class="btn-comments" type="submit">Upload</button>
-             <br>
-             </form>
-             </div>
+         
+
 
 </body>
 </html>

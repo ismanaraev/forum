@@ -41,20 +41,16 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	tmpl, err := template.ParseFiles(TemplateDir + "html/commentPage.html")
+	tmpl, err := template.ParseFiles(TemplateDir+"html/commentPage.html", TemplateDir+"html/header.html")
 	if err != nil {
 		log.Print(err)
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	idCtx := r.Context().Value("UserID")
+	idCtx := r.Context().Value(MiddlewareUID)
 	if idCtx == nil {
-		res := struct {
-			User    models.User
-			Post    models.Post
-			Comment []models.Comment
-		}{User: models.User{}, Post: post, Comment: comments}
-		err = tmpl.Execute(w, &res)
+		res := AllData{Data: models.User{}, Post: []models.Post{post}, Comments: comments}
+		err = tmpl.Execute(w, res)
 		if err != nil {
 			log.Print(err)
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -68,12 +64,12 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	res := struct {
-		User    models.User
-		Post    models.Post
-		Comment []models.Comment
-	}{User: user, Post: post, Comment: comments}
-	err = tmpl.Execute(w, &res)
+	res := AllData{
+		Data:     user,
+		Post:     []models.Post{post},
+		Comments: comments,
+	}
+	err = tmpl.Execute(w, res)
 	if err != nil {
 		log.Print(err)
 	}
@@ -82,7 +78,7 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		tmpl, err := template.ParseFiles(TemplateDir + "html/createPost.html")
+		tmpl, err := template.ParseFiles(TemplateDir+"html/createPost.html", TemplateDir+"html/header.html")
 		if err != nil {
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
@@ -105,6 +101,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		idCtx := r.Context().Value(MiddlewareUID)
 		if idCtx == nil {
+			log.Printf("userID context is nil")
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
@@ -115,24 +112,25 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		err = r.ParseForm()
+		err = r.ParseMultipartForm(models.MaxPictureSizeBytes)
 		if err != nil {
 			log.Print(err)
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		title := r.PostFormValue("title")
-		if title == "" {
+		title, ok := r.Form["title"]
+		if !ok {
+			log.Printf("title is empty")
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		content := r.PostFormValue("content")
-		if err != nil {
-			log.Print(err)
+		content, ok := r.Form["content"]
+		if !ok {
+			log.Print("content is empty")
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		categoriesArr := r.PostForm["categories"]
+		categoriesArr := r.Form["categories"]
 		var categories []models.Category
 		for _, val := range categoriesArr {
 			cat, err := h.service.GetCategoryByName(val)
@@ -143,17 +141,38 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			}
 			categories = append(categories, cat)
 		}
+		file, fileHeader, err := r.FormFile("picture")
+		if err != nil {
+			log.Print(err)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		if fileHeader.Size > models.MaxPictureSizeBytes {
+			log.Printf("file size is %v, expected less than %v", fileHeader.Size, models.MaxPictureSizeBytes)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		temp := make([]byte, fileHeader.Size)
+		n, err := file.Read(temp)
+		if err != nil || n != int(fileHeader.Size) {
+			log.Print(err)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+
 		post := models.Post{
-			Title:      title,
-			Content:    content,
+			Title:      title[0],
+			Content:    content[0],
 			Author:     user,
 			CreatedAt:  time.Now(),
 			Categories: categories,
+			Pictures:   models.Picture{Value: temp, Size: int(fileHeader.Size)},
 			Like:       0,
 			Dislike:    0,
 		}
 		err = h.service.CheckPostInput(post)
 		if err != nil {
+			log.Print(err)
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}

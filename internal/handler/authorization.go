@@ -139,7 +139,7 @@ func (h *Handler) logOutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idCtx := r.Context().Value("UserID")
+	idCtx := r.Context().Value(MiddlewareUID)
 	if idCtx == nil {
 		errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return

@@ -10,7 +10,7 @@ type UserID string
 
 const MiddlewareUID UserID = "UserID"
 
-func (h *Handler) IsAuthorized(next http.HandlerFunc) http.HandlerFunc {
+func (h *Handler) OnlyIfAuthorized(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := r.Cookie("session_name")
 		if err != nil {
@@ -29,7 +29,7 @@ func (h *Handler) IsAuthorized(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func (h *Handler) IfAuthorized(next http.HandlerFunc) http.HandlerFunc {
+func (h *Handler) MayBeAuthorized(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := r.Cookie("session_name")
 		if err != nil {

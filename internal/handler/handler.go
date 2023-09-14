@@ -3,7 +3,6 @@ package handler
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"forumv2"
 )
@@ -19,6 +18,7 @@ func NewHandler(service Service) *Handler {
 }
 
 const (
+	IndexAddress          = "/"
 	SignUpAddress         = "/sign-up"
 	SignInAddress         = "/sign-in"
 	LogoutAddress         = "/logout"
@@ -33,34 +33,28 @@ const (
 	FilterAddress         = "/filter"
 	SignatureCheck        = "/need-to-sign"
 	CreateCategoryAddress = "/create-category"
+	DeleteCategory        = "/delete-category"
 )
 
-func (h *Handler) InitRoutes() {
+func (h *Handler) InitRoutes(serverHost, serverPort string) {
 	router := http.NewServeMux()
 
-	router.HandleFunc("/", h.IfAuthorized(h.index))
+	router.HandleFunc("/", h.MayBeAuthorized(h.index))
 	router.HandleFunc(SignInAddress, h.userSignIn)
 	router.HandleFunc(SignUpAddress, h.userSignUp)
-	router.HandleFunc(LogoutAddress, h.IsAuthorized(h.logOutHandler))
-	router.HandleFunc(CreatePostAddress, h.IsAuthorized(h.CreatePost))
-	router.HandleFunc(PostAddress, h.IfAuthorized(h.Post))
-	router.HandleFunc(LikePostAddress, h.IsAuthorized(h.LikePost))
-	router.HandleFunc(LikeCommentAddress, h.IsAuthorized(h.LikeComment))
-	router.HandleFunc(CreateCommentAddress, h.IsAuthorized(h.CreateComment))
-	router.HandleFunc(MyProfileAddress, h.IsAuthorized(h.myprofile))
-	router.HandleFunc(FilterAddress, h.IfAuthorized(h.FilterByCategory))
+	router.HandleFunc(LogoutAddress, h.OnlyIfAuthorized(h.logOutHandler))
+	router.HandleFunc(CreatePostAddress, h.OnlyIfAuthorized(h.CreatePost))
+	router.HandleFunc(PostAddress, h.OnlyIfAuthorized(h.Post))
+	router.HandleFunc(LikePostAddress, h.OnlyIfAuthorized(h.LikePost))
+	router.HandleFunc(LikeCommentAddress, h.OnlyIfAuthorized(h.LikeComment))
+	router.HandleFunc(CreateCommentAddress, h.OnlyIfAuthorized(h.CreateComment))
+	router.HandleFunc(MyProfileAddress, h.OnlyIfAuthorized(h.myprofile))
+	router.HandleFunc(FilterAddress, h.MayBeAuthorized(h.FilterByCategory))
 	router.HandleFunc(SignatureCheck, h.needToSign)
-	router.HandleFunc(CreateCategoryAddress, h.IfAuthorized(h.CreateCategory))
+	router.HandleFunc(CreateCategoryAddress, h.OnlyIfAuthorized(h.CreateCategory))
+	router.HandleFunc(DeleteCategory, h.OnlyIfAuthorized(h.DeleteCategory))
 
 	router.Handle(TemplateAddress, http.StripPrefix("/template/", http.FileServer(http.Dir(TemplateDir))))
-	serverPort := os.Getenv("SERVER_PORT")
-	if serverPort == "" {
-		serverPort = "8081"
-	}
-	serverHost := os.Getenv("SERVER_ADDR")
-	if serverHost == "" {
-		serverHost = "127.0.0.1"
-	}
 	srv := new(forumv2.Server)
 	if err := srv.Run(serverHost, serverPort, router); err != nil {
 		log.Fatalf("error occured while running http server: %s", err.Error())

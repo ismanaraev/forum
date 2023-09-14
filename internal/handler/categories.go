@@ -29,7 +29,7 @@ func (h *Handler) FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	tmpl, err := template.ParseFiles(TemplateDir + "html/index.html")
+	tmpl, err := template.ParseFiles(TemplateDir+"html/index.html", TemplateDir+"html/header.html")
 	if err != nil {
 		log.Print(err)
 		errorHeader(w, "", http.StatusInternalServerError)
@@ -41,7 +41,7 @@ func (h *Handler) FilterByCategory(w http.ResponseWriter, r *http.Request) {
 			Post:       posts,
 			Categories: categories,
 		}
-		err = tmpl.Execute(w, &res)
+		err = tmpl.Execute(w, res)
 		if err != nil {
 			log.Print(err)
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -62,7 +62,7 @@ func (h *Handler) FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		Post:       posts,
 		Categories: categories,
 	}
-	err = tmpl.Execute(w, &res)
+	err = tmpl.Execute(w, res)
 	if err != nil {
 		log.Print(err)
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -90,5 +90,28 @@ func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, r.Referer(), http.StatusSeeOther)
+}
+
+func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		errorHeader(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+	err := r.ParseForm()
+	if err != nil {
+		errorHeader(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	catArr, ok := r.PostForm["name"]
+	if !ok {
+		errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	err = h.service.DeleteCategory(catArr[0])
+	if err != nil {
+		errorHeader(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, IndexAddress, http.StatusSeeOther)
 }

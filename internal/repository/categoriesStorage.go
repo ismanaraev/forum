@@ -44,18 +44,18 @@ func (p *categoriesStorage) CreateCategory(name string) error {
 	return err
 }
 
-func (p *categoriesStorage) GetCategoryByName(name string) (models.Category, error) {
+func (p *categoriesStorage) GetCategoryByName(name string) (*models.Category, error) {
 	stmt, err := p.db.Prepare(`SELECT id,name FROM categories WHERE name = $1`)
 	if err != nil {
-		return models.Category{}, err
+		return nil, err
 	}
 	row := stmt.QueryRow(name)
 	var res models.Category
 	err = row.Scan(&res.ID, &res.Name)
 	if err != nil {
-		return models.Category{}, err
+		return nil, err
 	}
-	return res, nil
+	return &res, nil
 }
 
 func (p *categoriesStorage) AddCategoryToPost(postId models.PostID, categoryId models.CategoryID) error {

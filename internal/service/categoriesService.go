@@ -17,11 +17,14 @@ func newCategoriesService(repo Repository) *categoriesService {
 }
 
 func (c *categoriesService) CreateCategory(name string) error {
-	_, err := c.repo.GetCategoryByName(name)
+	cat, err := c.repo.GetCategoryByName(name)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return err
 		}
+	}
+	if cat != nil {
+		return errors.New("category exists")
 	}
 	return c.repo.CreateCategory(name)
 }
