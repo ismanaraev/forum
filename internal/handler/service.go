@@ -8,6 +8,7 @@ type Service interface {
 	Session
 	Comments
 	Reactions
+	Categories
 }
 
 type User interface {
@@ -27,7 +28,6 @@ type Post interface {
 	GetUsersLikedPosts(id models.UserID) ([]models.Post, error)
 	GetPostByIDinService(id models.PostID) (models.Post, error)
 	FilterPostsByCategories([]string) ([]models.Post, error)
-	CreateCategory(string) error
 	GetCategoryByName(string) (models.Category, error)
 	CheckPostInput(models.Post) error
 }
@@ -46,4 +46,10 @@ type Comments interface {
 type Reactions interface {
 	LikePostService(like models.LikePost) error
 	LikeCommentService(like models.LikeComment) error
+}
+
+type Categories interface {
+	CreateCategory(name string) error
+	DeleteCategory(name string) error
+	GetAllCategories() ([]models.Category, error)
 }

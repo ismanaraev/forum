@@ -6,6 +6,10 @@ import (
 	"net/http"
 )
 
+type UserID string
+
+const MiddlewareUID UserID = "UserID"
+
 func (h *Handler) IsAuthorized(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := r.Cookie("session_name")
@@ -20,7 +24,7 @@ func (h *Handler) IsAuthorized(next http.HandlerFunc) http.HandlerFunc {
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "UserID", uuid)
+		ctx := context.WithValue(r.Context(), MiddlewareUID, uuid)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }
@@ -37,7 +41,7 @@ func (h *Handler) IfAuthorized(next http.HandlerFunc) http.HandlerFunc {
 			next.ServeHTTP(w, r)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "UserID", uuid)
+		ctx := context.WithValue(r.Context(), MiddlewareUID, uuid)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }

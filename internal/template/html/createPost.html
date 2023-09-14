@@ -31,31 +31,13 @@
         <fieldset>
           <div class="checkbox-content">
             <legend>Choose a category: </legend>
+            {{range .Categories}}
             <div>
-              <input type="checkbox" name="categories" value="Coding" />
-              <label for="coding">Coding</label>
+              <input type="checkbox" name="categories" value="{{.Name}}" />
+              <label>{{.Name}}</label>
             </div>
-            <div>
-              <input type="checkbox" name="categories" value="Music" />
-              <label for="music">Music</label>
-            </div>
-            <div>
-              <input type="checkbox" name="categories" value="Art" />
-              <label for="art">Art</label>
-            </div>
-            <div>
-              <input type="checkbox"  name="categories" value="Sports" />
-              <label for="sports">Sports</label>
-            </div>
-            <div>
-              <input type="checkbox" name="categories" value="Cooking" />
-              <label for="cooking">Cooking</label>
-            </div>
-            <div>
-                <input type="checkbox" name="categories" value="Other" />
-                <label for="cooking">Other</label>
-            </div>
-</div>
+            {{end}}   
+        </div>
           </fieldset>
         </div>
         <button class="btn" type="submit">Create Post</button>

@@ -19,19 +19,20 @@ func NewHandler(service Service) *Handler {
 }
 
 const (
-	SignUpAddress        = "/sign-up"
-	SignInAddress        = "/sign-in"
-	LogoutAddress        = "/logout"
-	CreatePostAddress    = "/create-post"
-	LikePostAddress      = "/like-post"
-	LikeCommentAddress   = "/like-comment"
-	CreateCommentAddress = "/create-comment"
-	MyProfileAddress     = "/myprofile"
-	PostAddress          = "/post/"
-	TemplateAddress      = "/template/"
-	TemplateDir          = "./internal/template/"
-	FilterAddress        = "/filter"
-	SignatureCheck       = "/need-to-sign"
+	SignUpAddress         = "/sign-up"
+	SignInAddress         = "/sign-in"
+	LogoutAddress         = "/logout"
+	CreatePostAddress     = "/create-post"
+	LikePostAddress       = "/like-post"
+	LikeCommentAddress    = "/like-comment"
+	CreateCommentAddress  = "/create-comment"
+	MyProfileAddress      = "/myprofile"
+	PostAddress           = "/post/"
+	TemplateAddress       = "/template/"
+	TemplateDir           = "./internal/template/"
+	FilterAddress         = "/filter"
+	SignatureCheck        = "/need-to-sign"
+	CreateCategoryAddress = "/create-category"
 )
 
 func (h *Handler) InitRoutes() {
@@ -49,6 +50,7 @@ func (h *Handler) InitRoutes() {
 	router.HandleFunc(MyProfileAddress, h.IsAuthorized(h.myprofile))
 	router.HandleFunc(FilterAddress, h.IfAuthorized(h.FilterByCategory))
 	router.HandleFunc(SignatureCheck, h.needToSign)
+	router.HandleFunc(CreateCategoryAddress, h.IfAuthorized(h.CreateCategory))
 
 	router.Handle(TemplateAddress, http.StripPrefix("/template/", http.FileServer(http.Dir(TemplateDir))))
 	serverPort := os.Getenv("SERVER_PORT")

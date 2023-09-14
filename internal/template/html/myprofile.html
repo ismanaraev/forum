@@ -44,7 +44,7 @@
 {{ range .LikePost }}
 <fieldset> 
   
-    <legend class="author">{{ .Author }}</legend>
+    <legend class="author">{{ .Author.Name }}</legend>
     <div class="content-limit">
         <a href="/post/{{ .ID }}">{{ .Title }}</a>
         <div class="content">

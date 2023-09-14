@@ -10,6 +10,7 @@ type service struct {
 	*postService
 	*sessionService
 	*commentService
+	*categoriesService
 	*reactionsService
 }
 
@@ -25,9 +26,10 @@ type Repository interface {
 func NewService(repo Repository) *service {
 	return &service{
 		newUserService(repo),
-		newPostService(repo, repo, repo),
+		newPostService(repo),
 		newSessionService(repo),
 		newCommentsService(repo),
+		newCategoriesService(repo),
 		newReactionsService(repo, repo, repo),
 	}
 }
@@ -84,4 +86,6 @@ type Categories interface {
 	GetCategoryByName(string) (models.Category, error)
 	GetCategoriesByPostID(models.PostID) ([]models.Category, error)
 	GetPostsByCategory(category models.Category) ([]models.Post, error)
+	DeleteCategory(name string) error
+	GetAllCategories() ([]models.Category, error)
 }

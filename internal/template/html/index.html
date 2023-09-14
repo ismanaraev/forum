@@ -30,6 +30,18 @@
   </nav>
     {{ end }}
 <br>
+<div>
+    <form class="form" action="/filter" method="get">
+	{{ range .Categories }}
+	    <div class="category"><input name="category" type="checkbox" value="{{.Name}}">{{.Name}} </div>
+	{{end}}
+    <button type="submit" class="btn">Search</button>
+    </form>
+</div>
+<form class="form" action="/create-category" method="post">
+	<input name="name" required></input>
+	<button class="btn" label="create category" type="submit">Create category</button>
+</form> 
 <div class="post">
     {{ range .Post }}
       <fieldset>
@@ -39,7 +51,7 @@
           <div class="content">
                 {{  .Content }}
             <br><br>
-            <p class="category">Category: {{ range .Categories }}{{.Name}}{{end}}</p> 
+            <p class="category">Category: {{ range .Categories }}{{.Name}} {{end}}</p> 
 	    <p>{{.CreatedAt.Format "2006-01-02 03:04:05"}}</p>
             </div>
             </div>

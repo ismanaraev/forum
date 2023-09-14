@@ -12,7 +12,7 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	idCtx := r.Context().Value("UserID")
+	idCtx := r.Context().Value(MiddlewareUID)
 	if idCtx == nil {
 		errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return

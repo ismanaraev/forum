@@ -8,8 +8,9 @@ import (
 )
 
 type AllData struct {
-	Data models.User
-	Post []models.Post
+	Data       models.User
+	Post       []models.Post
+	Categories []models.Category
 }
 
 func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
@@ -26,16 +27,18 @@ func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 	html, err := template.ParseFiles(TemplateDir + "html/index.html")
 	if err != nil {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		log.Printf("failed to parse template files: %v", err)
 		return
 	}
 
 	res, err := h.service.GetAllPostService()
 	if err != nil {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		log.Printf("failed to getAllPosts: %v", err)
 		return
 	}
 
-	idCtx := r.Context().Value("UserID")
+	idCtx := r.Context().Value(MiddlewareUID)
 	if idCtx == nil {
 		result := &AllData{
 			Post: res,
@@ -52,20 +55,23 @@ func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
 	userInfo, err := h.service.GetUsersInfoByUUIDService(id)
 	if err != nil {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		log.Printf("failed to get user info by userID: %v", err)
 		return
 	}
 
-	postData, err := h.service.GetAllPostService()
+	categories, err := h.service.GetAllCategories()
 	if err != nil {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		log.Printf("failed to get all categories: %v", err)
 		return
 	}
 
 	result := &AllData{
-		Data: userInfo,
-		Post: postData,
+		Data:       userInfo,
+		Post:       res,
+		Categories: categories,
 	}
-	err = html.Execute(w, result)
+	err = html.Execute(w, &result)
 	if err != nil {
 		log.Print(err)
 	}

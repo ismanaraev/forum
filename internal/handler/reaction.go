@@ -12,7 +12,7 @@ func (h *Handler) LikeComment(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	idString := r.Context().Value("UserID")
+	idString := r.Context().Value(MiddlewareUID)
 	if idString == nil {
 		errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -86,7 +86,12 @@ func (h *Handler) LikePost(w http.ResponseWriter, r *http.Request) {
 		errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	userID := r.Context().Value("UserID").(models.UserID)
+	userIDInterface := r.Context().Value(MiddlewareUID)
+	userID, ok := userIDInterface.(models.UserID)
+	if !ok {
+		errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
 	postID, err := strconv.ParseInt(postIDStr, 10, 64)
 	if err != nil {
 		log.Print(err)

@@ -87,14 +87,23 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		err = tmpl.Execute(w, nil)
+		categories, err := h.service.GetAllCategories()
+		if err != nil {
+			log.Printf("failed to get all categories: %v", err)
+			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		data := AllData{
+			Categories: categories,
+		}
+		err = tmpl.Execute(w, data)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
 	case http.MethodPost:
-		idCtx := r.Context().Value("UserID")
+		idCtx := r.Context().Value(MiddlewareUID)
 		if idCtx == nil {
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
@@ -124,21 +133,24 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		categoriesArr := r.PostForm["categories"]
+		var categories []models.Category
 		for _, val := range categoriesArr {
-			err = h.service.CreateCategory(val)
+			cat, err := h.service.GetCategoryByName(val)
 			if err != nil {
 				log.Print(err)
-				errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+				errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
+			categories = append(categories, cat)
 		}
 		post := models.Post{
-			Title:     title,
-			Content:   content,
-			Author:    user,
-			CreatedAt: time.Now(),
-			Like:      0,
-			Dislike:   0,
+			Title:      title,
+			Content:    content,
+			Author:     user,
+			CreatedAt:  time.Now(),
+			Categories: categories,
+			Like:       0,
+			Dislike:    0,
 		}
 		err = h.service.CheckPostInput(post)
 		if err != nil {

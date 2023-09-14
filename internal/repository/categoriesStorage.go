@@ -94,3 +94,36 @@ func (c *categoriesStorage) GetPostsByCategory(category models.Category) ([]mode
 	}
 	return res, nil
 }
+
+func (c *categoriesStorage) DeleteCategory(name string) error {
+	stmt, err := c.db.Prepare(`DELETE FROM categories WHERE name = $1`)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *categoriesStorage) GetAllCategories() ([]models.Category, error) {
+	stmt, err := c.db.Prepare(`SELECT ID,name FROM categories`)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query()
+	if err != nil {
+		return nil, err
+	}
+	var res []models.Category
+	for rows.Next() {
+		var temp models.Category
+		err = rows.Scan(&temp.ID, &temp.Name)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, temp)
+	}
+	return res, nil
+}

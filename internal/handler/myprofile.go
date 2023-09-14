@@ -25,7 +25,7 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idCtx := r.Context().Value("UserID")
+	idCtx := r.Context().Value(MiddlewareUID)
 	id := idCtx.(models.UserID)
 
 	switch r.Method {
@@ -56,7 +56,7 @@ func (h *Handler) myprofile(w http.ResponseWriter, r *http.Request) {
 			LikePost: userLikePosts,
 		}
 
-		err = html.Execute(w, data)
+		err = html.Execute(w, &data)
 		if err != nil {
 			log.Print(err)
 			errorHeader(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

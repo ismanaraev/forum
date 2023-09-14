@@ -38,7 +38,7 @@
                     {{  .Post.Content }}
                     </div>
                 <br><br>
-                <p>Category:{{ range .Post.Categories }}{{.Name}} {{end}}</p> 
+                <p>Category:{{ range .Post.Categories }}{{.Name}}{{end}}</p> 
                 <div class="reactions">
                 <form action="/like-post" method="POST">
                     <input type="hidden" name="postID" value="{{.Post.ID}}">
@@ -56,7 +56,7 @@
                  <div class="comment-field">
                     <fieldset>   
                         <div class="content-limit">
-                        <legend>{{ .Author }}</legend> 
+                        <legend>{{ .Author.Name }}</legend> 
                         <div class="comment-content" > {{ .Content }}</div>
                              </div>   
                     </fieldset>

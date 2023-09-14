@@ -7,16 +7,12 @@ import (
 )
 
 type postService struct {
-	repo           Post
-	userRepo       User
-	categoriesRepo Categories
+	repo Repository
 }
 
-func newPostService(repo Post, userRepo User, catRepo Categories) *postService {
+func newPostService(repo Repository) *postService {
 	return &postService{
-		repo:           repo,
-		userRepo:       userRepo,
-		categoriesRepo: catRepo,
+		repo: repo,
 	}
 }
 
@@ -43,7 +39,17 @@ func (p *postService) CheckPostInput(post models.Post) error {
 }
 
 func (p *postService) CreatePostService(post models.Post) (models.PostID, error) {
-	return p.repo.CreatePost(post)
+	postId, err := p.repo.CreatePost(post)
+	if err != nil {
+		return 0, err
+	}
+	for _, val := range post.Categories {
+		err = p.repo.AddCategoryToPost(postId, val.ID)
+		if err != nil {
+			return 0, err
+		}
+	}
+	return postId, nil
 }
 
 func (p *postService) GetAllPostService() ([]models.Post, error) {
@@ -52,11 +58,11 @@ func (p *postService) GetAllPostService() ([]models.Post, error) {
 		return nil, err
 	}
 	for i := range posts {
-		posts[i].Author, err = p.userRepo.GetUsersInfoByUUID(posts[i].Author.ID)
+		posts[i].Author, err = p.repo.GetUsersInfoByUUID(posts[i].Author.ID)
 		if err != nil {
 			return nil, err
 		}
-		categories, err := p.categoriesRepo.GetCategoriesByPostID(posts[i].ID)
+		categories, err := p.repo.GetCategoriesByPostID(posts[i].ID)
 		if err != nil {
 			return nil, err
 		}
@@ -70,11 +76,11 @@ func (p *postService) GetPostByIDinService(id models.PostID) (models.Post, error
 	if err != nil {
 		return models.Post{}, err
 	}
-	author, err := p.userRepo.GetUsersInfoByUUID(post.Author.ID)
+	author, err := p.repo.GetUsersInfoByUUID(post.Author.ID)
 	if err != nil {
 		return models.Post{}, err
 	}
-	categories, err := p.categoriesRepo.GetCategoriesByPostID(post.ID)
+	categories, err := p.repo.GetCategoriesByPostID(post.ID)
 	if err != nil {
 		return models.Post{}, err
 	}
@@ -88,12 +94,12 @@ func (p *postService) GetUsersPostInService(id models.UserID) ([]models.Post, er
 	if err != nil {
 		return nil, err
 	}
-	user, err := p.userRepo.GetUsersInfoByUUID(id)
+	user, err := p.repo.GetUsersInfoByUUID(id)
 	if err != nil {
 		return nil, err
 	}
 	for i := range posts {
-		categories, err := p.categoriesRepo.GetCategoriesByPostID(posts[i].ID)
+		categories, err := p.repo.GetCategoriesByPostID(posts[i].ID)
 		if err != nil {
 			return nil, err
 		}
@@ -106,7 +112,7 @@ func (p *postService) GetUsersPostInService(id models.UserID) ([]models.Post, er
 func (p *postService) FilterPostsByCategories(categoriesString []string) ([]models.Post, error) {
 	var categories []models.Category
 	for _, val := range categoriesString {
-		temp, err := p.categoriesRepo.GetCategoryByName(val)
+		temp, err := p.repo.GetCategoryByName(val)
 		if err != nil {
 			return nil, err
 		}
@@ -117,11 +123,11 @@ func (p *postService) FilterPostsByCategories(categoriesString []string) ([]mode
 		return nil, err
 	}
 	for i := range posts {
-		author, err := p.userRepo.GetUsersInfoByUUID(posts[i].Author.ID)
+		author, err := p.repo.GetUsersInfoByUUID(posts[i].Author.ID)
 		if err != nil {
 			return nil, err
 		}
-		postCats, err := p.categoriesRepo.GetCategoriesByPostID(posts[i].ID)
+		postCats, err := p.repo.GetCategoriesByPostID(posts[i].ID)
 		if err != nil {
 			return nil, err
 		}
@@ -131,12 +137,8 @@ func (p *postService) FilterPostsByCategories(categoriesString []string) ([]mode
 	return posts, nil
 }
 
-func (p *postService) CreateCategory(name string) error {
-	return p.categoriesRepo.CreateCategory(name)
-}
-
 func (p *postService) GetCategoryByName(name string) (models.Category, error) {
-	return p.categoriesRepo.GetCategoryByName(name)
+	return p.repo.GetCategoryByName(name)
 }
 
 func (p *postService) GetUsersLikedPosts(id models.UserID) ([]models.Post, error) {
@@ -144,12 +146,12 @@ func (p *postService) GetUsersLikedPosts(id models.UserID) ([]models.Post, error
 	if err != nil {
 		return nil, err
 	}
-	author, err := p.userRepo.GetUsersInfoByUUID(id)
+	author, err := p.repo.GetUsersInfoByUUID(id)
 	if err != nil {
 		return nil, err
 	}
 	for i := range posts {
-		cats, err := p.categoriesRepo.GetCategoriesByPostID(posts[i].ID)
+		cats, err := p.repo.GetCategoriesByPostID(posts[i].ID)
 		if err != nil {
 			return nil, err
 		}

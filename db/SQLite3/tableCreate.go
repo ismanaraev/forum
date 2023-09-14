@@ -55,7 +55,7 @@ var tables []string = []string{
 		);`,
 	`CREATE TABLE IF NOT EXISTS categories(
 		ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		name VARCHAR(50) NOT NULL
+		name VARCHAR(50) UNIQUE NOT NULL
 		);`,
 	`CREATE TABLE IF NOT EXISTS categoriesPost(
 		categoryID INTEGER NOT NULL,
