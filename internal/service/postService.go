@@ -51,8 +51,8 @@ func (p *postService) CreatePostService(post models.Post) (models.PostID, error)
 			return 0, err
 		}
 	}
-	temp := base64.StdEncoding.EncodeToString(post.Pictures.Value)
-	err = p.repo.AddPictureToPost(postId, models.Picture{Value: []byte(temp)})
+	temp := base64.StdEncoding.EncodeToString([]byte(post.Pictures.Value))
+	err = p.repo.AddPictureToPost(postId, models.Picture{Value: temp, Type: post.Pictures.Type, Size: post.Pictures.Size})
 	if err != nil {
 		return 0, err
 	}

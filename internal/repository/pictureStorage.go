@@ -1,9 +1,7 @@
 package repository
 
 import (
-	"bytes"
 	"database/sql"
-	"encoding/base64"
 	"forumv2/internal/models"
 )
 
@@ -16,11 +14,11 @@ func newPictureStorage(db *sql.DB) *pictureStorage {
 }
 
 func (p *pictureStorage) AddPictureToPost(id models.PostID, pic models.Picture) error {
-	stmt, err := p.db.Prepare(`INSERT INTO picture (postID, value) VALUES ($1,$2)`)
+	stmt, err := p.db.Prepare(`INSERT INTO picture (postID, value, type, size) VALUES ($1,$2,$3,$4)`)
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(id, string(pic.Value))
+	_, err = stmt.Exec(id, string(pic.Value), pic.Type, pic.Size)
 	if err != nil {
 		return err
 	}
@@ -28,7 +26,7 @@ func (p *pictureStorage) AddPictureToPost(id models.PostID, pic models.Picture) 
 }
 
 func (p *pictureStorage) GetPictureByPostID(id models.PostID) (models.Picture, error) {
-	stmt, err := p.db.Prepare(`SELECT value FROM picture WHERE postID = $1`)
+	stmt, err := p.db.Prepare(`SELECT value, type, size FROM picture WHERE postID = $1`)
 	if err != nil {
 		return models.Picture{}, err
 	}
@@ -38,14 +36,17 @@ func (p *pictureStorage) GetPictureByPostID(id models.PostID) (models.Picture, e
 	}
 	var res models.Picture
 	var tmpStr string
-	err = row.Scan(&tmpStr)
+	var imageType string
+	var size int
+	err = row.Scan(&tmpStr, &imageType, &size)
 	if err != nil {
 		return models.Picture{}, err
 	}
-	decoder := base64.NewDecoder(base64.StdEncoding, bytes.NewReader([]byte(tmpStr)))
-	_, err = decoder.Read(res.Value)
+	res.Value = tmpStr
+	res.Type, err = models.StringToImageType(imageType)
 	if err != nil {
 		return models.Picture{}, err
 	}
+	res.Size = size
 	return res, nil
 }

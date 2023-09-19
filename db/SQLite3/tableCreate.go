@@ -65,7 +65,9 @@ var tables []string = []string{
 		);`,
 	`CREATE TABLE IF NOT EXISTS picture(
 		ID INTEGER PRIMARY KEY AUTOINCREMENT,
-		value STRING NOT NULL,
+		value TEXT NOT NULL,
+		type TEXT NOT NULL,
+		size INTEGER NOT NULL,
 		postID INTEGER NOT NULL,
 		FOREIGN KEY (postID) REFERENCES post(ID) ON DELETE CASCADE
 		);`,

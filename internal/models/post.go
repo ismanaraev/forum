@@ -17,8 +17,3 @@ type Post struct {
 	Like       int        `json:"like"`
 	Dislike    int        `json:"dislike"`
 }
-
-type Picture struct {
-	Value []byte
-	Size  int
-}

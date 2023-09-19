@@ -19,7 +19,7 @@
              <h3>{{ .Title }}</h3>
                     {{  .Content }}
                 <br>
-                <img src="data:image/jpeg;base64, {{ .Pictures }}">
+                <img src="data:{{ .Pictures.Type }};base64, {{ .Pictures.Value }}">
                 <p>Category:{{ range .Categories }}{{.Name}}{{end}}</p> 
                 <div class="reactions">
                 <form action="/like-post" method="POST">

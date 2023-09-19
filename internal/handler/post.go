@@ -149,12 +149,18 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 		if fileHeader.Size > models.MaxPictureSizeBytes {
 			log.Printf("file size is %v, expected less than %v", fileHeader.Size, models.MaxPictureSizeBytes)
-			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			errorHeader(w, "Image size is too big, please try uploading smaller images", http.StatusBadRequest)
 			return
 		}
 		temp := make([]byte, fileHeader.Size)
 		n, err := file.Read(temp)
 		if err != nil || n != int(fileHeader.Size) {
+			log.Print(err)
+			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		imageType, err := models.StringToImageType(http.DetectContentType(temp))
+		if err != nil {
 			log.Print(err)
 			errorHeader(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
@@ -166,7 +172,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			Author:     user,
 			CreatedAt:  time.Now(),
 			Categories: categories,
-			Pictures:   models.Picture{Value: temp, Size: int(fileHeader.Size)},
+			Pictures:   models.Picture{Value: string(temp), Size: int(fileHeader.Size), Type: imageType},
 			Like:       0,
 			Dislike:    0,
 		}
