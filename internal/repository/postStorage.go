@@ -148,6 +148,19 @@ func (p *postStorage) UpdatePost(post models.Post) error {
 	return nil
 }
 
+func (p *postStorage) DeletePostByID(postID models.PostID) error {
+	stmt := `DELETE FROM post WHERE ID=$1`
+	query, err := p.db.Prepare(stmt)
+	if err != nil {
+		return err
+	}
+	_, err = query.Exec(postID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *postStorage) FilterPostsByMultipleCategories(categories []models.Category) ([]models.Post, error) {
 	if len(categories) == 0 {
 		return nil, nil

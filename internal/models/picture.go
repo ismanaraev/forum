@@ -2,6 +2,10 @@ package models
 
 import "fmt"
 
+const MaxPictureSizeBytes = 20_000_000
+
+const MaxPicturesPerPost = 10
+
 type ImageType string
 
 const (

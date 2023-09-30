@@ -28,13 +28,13 @@ func (p *postService) CheckPostInput(post models.Post) error {
 	if content := strings.Trim(post.Content, "\r\n "); len(content) == 0 {
 		return errors.New("empty title")
 	}
-	if len(post.Title) > 50 {
+	if len(post.Title) > models.PostMaxTitleLen {
 		return errors.New("title too long")
 	}
 	if len(post.Content) == 0 {
 		return errors.New("empty content")
 	}
-	if len(post.Content) > 1000 {
+	if len(post.Content) > models.PostMaxContentLen {
 		return errors.New("content too long")
 	}
 	return nil
@@ -51,10 +51,15 @@ func (p *postService) CreatePostService(post models.Post) (models.PostID, error)
 			return 0, err
 		}
 	}
-	temp := base64.StdEncoding.EncodeToString([]byte(post.Pictures.Value))
-	err = p.repo.AddPictureToPost(postId, models.Picture{Value: temp, Type: post.Pictures.Type, Size: post.Pictures.Size})
-	if err != nil {
-		return 0, err
+	if len(post.Pictures) != 0 {
+
+		for _, pic := range post.Pictures {
+			temp := base64.StdEncoding.EncodeToString([]byte(pic.Value))
+			err = p.repo.AddPictureToPost(postId, models.Picture{Value: temp, Type: pic.Type, Size: pic.Size})
+			if err != nil {
+				return 0, err
+			}
+		}
 	}
 	return postId, nil
 }
@@ -74,7 +79,7 @@ func (p *postService) GetAllPostService() ([]models.Post, error) {
 			return nil, err
 		}
 		posts[i].Categories = categories
-		posts[i].Pictures, err = p.repo.GetPictureByPostID(posts[i].ID)
+		posts[i].Pictures, err = p.repo.GetPicturesByPostID(posts[i].ID)
 		if err != nil {
 			if !errors.Is(err, sql.ErrNoRows) {
 				return nil, err
@@ -97,7 +102,7 @@ func (p *postService) GetPostByIDinService(id models.PostID) (models.Post, error
 	if err != nil {
 		return models.Post{}, err
 	}
-	picture, err := p.repo.GetPictureByPostID(id)
+	picture, err := p.repo.GetPicturesByPostID(id)
 	if err != nil {
 		return models.Post{}, err
 	}
@@ -149,8 +154,13 @@ func (p *postService) FilterPostsByCategories(categoriesString []string) ([]mode
 		if err != nil {
 			return nil, err
 		}
+		postPics, err := p.repo.GetPicturesByPostID(posts[i].ID)
+		if err != nil {
+			return nil, err
+		}
 		posts[i].Author = author
 		posts[i].Categories = postCats
+		posts[i].Pictures = postPics
 	}
 	return posts, nil
 }
@@ -178,4 +188,12 @@ func (p *postService) GetUsersLikedPosts(id models.UserID) ([]models.Post, error
 		posts[i].Author = author
 	}
 	return posts, nil
+}
+
+func (p *postService) UpdatePost(post models.Post) error {
+	return p.repo.UpdatePost(post)
+}
+
+func (p *postService) DeletePostByID(ID models.PostID) error {
+	return p.repo.DeletePostByID(ID)
 }

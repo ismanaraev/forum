@@ -36,8 +36,10 @@
         <div class="content-limit">
           <a href="/post/{{.ID}}">{{ .Title }}</a>
           <div class="content">
-                {{  .Content }}
-            <img src="data:{{ .Pictures.Type }};base64, {{ .Pictures.Value }}">
+	      <pre>{{  .Content }}</pre>
+		{{range .Pictures}}
+            <img src="data:{{ .Type }};base64, {{ .Value }}">
+	    {{end}}
             <br><br>
             <p class="category">Category: {{ range .Categories }}{{.Name}} {{end}}</p> 
 	    <p>{{.CreatedAt.Format "2006-01-02 03:04:05"}}</p>

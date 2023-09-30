@@ -21,8 +21,7 @@
     <div class="content-limit">
       <a href="/post/{{ .ID }}">{{ .Title }}</a>
       <div class="content">
-     
-            {{  .Content }}
+	  <pre>{{  .Content }}</pre>
         <br><br>
         <p class="category">Category: {{ range .Categories }}{{.Name}} {{end}}</p> 
         </div>
@@ -41,7 +40,7 @@
     <div class="content-limit">
         <a href="/post/{{ .ID }}">{{ .Title }}</a>
         <div class="content">
-     {{.Content}}
+	    <pre>{{.Content}}</pre>
      <br>
      <button class="btn-like" >{{.Like}}</button>
      <button class="btn-dislike" >{{.Dislike}}</button>    

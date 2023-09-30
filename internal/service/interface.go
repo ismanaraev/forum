@@ -52,6 +52,7 @@ type Post interface {
 	GetUsersLikePosts(id models.UserID) ([]models.Post, error)
 	FilterPostsByMultipleCategories(categories []models.Category) ([]models.Post, error)
 	UpdatePost(models.Post) error
+	DeletePostByID(models.PostID) error
 }
 
 type Session interface {
@@ -93,5 +94,5 @@ type Categories interface {
 
 type Pictures interface {
 	AddPictureToPost(id models.PostID, pic models.Picture) error
-	GetPictureByPostID(id models.PostID) (models.Picture, error)
+	GetPicturesByPostID(id models.PostID) ([]models.Picture, error)
 }

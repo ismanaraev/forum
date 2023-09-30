@@ -25,28 +25,32 @@ func (p *pictureStorage) AddPictureToPost(id models.PostID, pic models.Picture) 
 	return nil
 }
 
-func (p *pictureStorage) GetPictureByPostID(id models.PostID) (models.Picture, error) {
+func (p *pictureStorage) GetPicturesByPostID(id models.PostID) ([]models.Picture, error) {
 	stmt, err := p.db.Prepare(`SELECT value, type, size FROM picture WHERE postID = $1`)
 	if err != nil {
-		return models.Picture{}, err
+		return nil, err
 	}
-	row := stmt.QueryRow(id)
+	rows, err := stmt.Query(id)
 	if err != nil {
-		return models.Picture{}, err
+		return nil, err
 	}
-	var res models.Picture
-	var tmpStr string
-	var imageType string
-	var size int
-	err = row.Scan(&tmpStr, &imageType, &size)
-	if err != nil {
-		return models.Picture{}, err
+	var res []models.Picture
+	for rows.Next() {
+		var temp models.Picture
+		var tmpStr string
+		var imageType string
+		var size int
+		err = rows.Scan(&tmpStr, &imageType, &size)
+		if err != nil {
+			return nil, err
+		}
+		temp.Value = tmpStr
+		temp.Type, err = models.StringToImageType(imageType)
+		if err != nil {
+			return nil, err
+		}
+		temp.Size = size
+		res = append(res, temp)
 	}
-	res.Value = tmpStr
-	res.Type, err = models.StringToImageType(imageType)
-	if err != nil {
-		return models.Picture{}, err
-	}
-	res.Size = size
 	return res, nil
 }

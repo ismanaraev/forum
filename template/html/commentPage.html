@@ -14,36 +14,41 @@
     {{template "header" .}}
         <fieldset class="field">
             <div class="canvas">
-            {{range .Post}}
-            <legend>{{ .Author.Name }}</legend>
-             <h3>{{ .Title }}</h3>
-                    {{  .Content }}
+		{{if .Data}}
+			<form action="/update-post" method="get">
+				<button class="btn-comments" name="post" value="{{.Post.ID}}">Update Post</button>
+			</form>
+			<form action="/delete-post" method="get">
+				<button class="btn-comments" name="post" value="{{.Post.ID}}">Delete Post</button>
+			</form>
+		{{end}}
+            <legend>{{ .Post.Author.Name }}</legend>
+             <h3>{{ .Post.Title }}</h3>
+	     <pre>{{  .Post.Content }}</pre>
                 <br>
-                <img src="data:{{ .Pictures.Type }};base64, {{ .Pictures.Value }}">
-                <p>Category:{{ range .Categories }}{{.Name}}{{end}}</p> 
+		{{range .Post.Pictures}}
+                <img src="data:{{ .Type }};base64, {{ .Value }}">
+		{{end}}
+		<p>Category:{{ range .Post.Categories }}<a class="categoryTag" href="/filter?category={{.Name}}">{{.Name}}</a> {{end}}</p> 
                 <div class="reactions">
                 <form action="/like-post" method="POST">
-                    <input type="hidden" name="postID" value="{{.ID}}">
+                    <input type="hidden" name="postID" value="{{.Post.ID}}">
                     <button class="btn-like" name="status" type="submit" value="1">Like</button>
-                    <p class="like-count">{{.Like}}</p>
+                    <p class="like-count">{{.Post.Like}}</p>
                     <button class="btn-dislike" name="status" type="submit" value="-1">Dislike</button>
-                    <p class="dislike-count">{{.Dislike}}</p>
+                    <p class="dislike-count">{{.Post.Dislike}}</p>
                 </form>
                 </div>
                 <div class="create-comment">
                     <form action="/create-comment" method="POST">
-                    <input type="hidden" value="{{.ID}}" name="postID">
+                    <input type="hidden" value="{{.Post.ID}}" name="postID">
                     <textarea class="comments-class" type="txt" name="content"></textarea>
                     <br>
                     <button class="btn-comments" type="submit">Upload</button>
                     <br>
                     </form>
                     </div>
-               {{ end }}
 
-               <form >
-                <input type="file">
-               </form>
                 </div>
                 <p class="comments-h">Comments:</p>
                  {{ range .Comments }}
@@ -51,7 +56,7 @@
                     <fieldset>   
                         <div class="content-limit">
                         <legend>{{ .Author.Name }}</legend> 
-                        <div class="comment-content" > {{ .Content }}</div>
+			<div class="comment-content" > <pre>{{ .Content }}</pre></div>
                              </div>   
                     </fieldset>
                 </div>
@@ -65,11 +70,6 @@
 		    </form>
             {{end}}
         </div>
-         
         </fieldset>
-    
-         
-
-
 </body>
 </html>

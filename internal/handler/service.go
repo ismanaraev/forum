@@ -30,6 +30,8 @@ type Post interface {
 	FilterPostsByCategories([]string) ([]models.Post, error)
 	GetCategoryByName(string) (models.Category, error)
 	CheckPostInput(models.Post) error
+	UpdatePost(models.Post) error
+	DeletePostByID(models.PostID) error
 }
 
 type Session interface {

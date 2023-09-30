@@ -4,7 +4,9 @@ import "time"
 
 type PostID int64
 
-const MaxPictureSizeBytes = 20_000_000
+const PostMaxTitleLen = 50
+
+const PostMaxContentLen = 1000
 
 type Post struct {
 	ID         PostID     `json:"id"`
@@ -13,7 +15,7 @@ type Post struct {
 	Author     User       `json:"author"`
 	CreatedAt  time.Time  `json:"createdat"`
 	Categories []Category `json:"categories"`
-	Pictures   Picture    `json:"pictures"`
+	Pictures   []Picture  `json:"pictures"`
 	Like       int        `json:"like"`
 	Dislike    int        `json:"dislike"`
 }
